@@ -1,0 +1,106 @@
+Skip to content
+Search or jump to…
+
+Pull requests
+Issues
+Marketplace
+Explore
+ 
+@FazDoesCode 
+AxxAL
+/
+MyGame
+1
+00
+Code
+Issues
+Pull requests
+Actions
+Projects
+Wiki
+Security
+Insights
+MyGame/.gitignore
+
+Axel AMOGA GIWJ(DAWHIJOUWAD
+Latest commit fbd6a5a on Apr 1
+ History
+ 0 contributors
+63 lines (55 sloc)  642 Bytes
+  
+#OS junk files
+[Tt]humbs.db
+*.DS_Store
+
+#Visual Studio files
+*.pidb
+*.userprefs
+*.[Oo]bj
+*.exe
+*.pdb
+*.user
+*.aps
+*.pch
+*.vspscc
+*.vssscc
+*_i.c
+*_p.c
+*.ncb
+*.suo
+*.tlb
+*.tlh
+*.bak
+*.[Cc]ache
+*.ilk
+*.log
+*.lib
+*.sbr
+*.sdf
+ipch/
+obj/
+[Bb]in
+[Dd]ebug*/
+[Rr]elease*/
+Ankh.NoLoad
+
+#Tooling
+_ReSharper*/
+*.resharper
+[Tt]est[Rr]esult*
+
+#Project files
+[Bb]uild/
+
+#Subversion files
+.svn
+
+# Office Temp Files
+~$*
+
+#monodroid private beta
+monodroid*.msi
+/CompiledContent/Android/IgnoreMe.dll
+/CompiledContent/OSX/IgnoreMe.dll
+/CompiledContent/Windows8/IgnoreMe.dll
+/CompiledContent/Windows/IgnoreMe.dll
+*.cachefile
+*.dll
+
+# JetBrains
+.idea/
+
+# Misc
+.env
+© 2021 GitHub, Inc.
+Terms
+Privacy
+Security
+Status
+Docs
+Contact GitHub
+Pricing
+API
+Training
+Blog
+About
+Loading complete
