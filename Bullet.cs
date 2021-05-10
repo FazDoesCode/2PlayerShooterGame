@@ -11,6 +11,9 @@ namespace shooter2playergame
         private Vector2 position;
         private Texture2D texture2D;
         Vector2 direction;
+
+        public Rectangle bulletRect;
+
         public Bullet(Texture2D texture2D, Vector2 position, Vector2 direction)
         {
             this.position = position;
@@ -25,7 +28,7 @@ namespace shooter2playergame
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            Rectangle bulletRect = new Rectangle((int)position.X, (int)position.Y, (int)(texture2D.Width * 0.25f), (int)(texture2D.Height * 0.25f));
+            bulletRect = new Rectangle((int)position.X, (int)position.Y, (int)(texture2D.Width * 0.25f), (int)(texture2D.Height * 0.25f));
             spriteBatch.Draw(texture2D, bulletRect, Color.White);
         }
     }

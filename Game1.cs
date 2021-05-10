@@ -15,19 +15,25 @@ namespace shooter2playergame
 
         Texture2D MainMenuSprite;
         Texture2D redguySprite;
+        Texture2D redguySpriteDodge;
         Texture2D blueguySprite;
+        Texture2D blueguySpriteDodge;
         Texture2D bulletSprite;
         Vector2 redguyPos = new Vector2(100, 175);
         Vector2 blueguyPos = new Vector2(600, 175);
 
         int redDodgeDelay = 1000;
+        int redInvulnTime = 500;
         double redtimeSinceLastDodge = 0;
+        double redInvulnTimer = 0;
 
         bool redfireDelay = false;
         bool redIsDodging = false;
 
         int blueDodgeDelay = 1000;
+        int blueInvulnTime = 500;
         double bluetimeSinceLastDodge = 0;
+        double blueInvulnTimer = 0;
 
         bool bluefireDelay = false;
         bool blueIsDodging = false;
@@ -36,6 +42,9 @@ namespace shooter2playergame
         bool gameHasStarted = false;
 
         List<Bullet> bullets = new List<Bullet>();
+
+        Rectangle redguyRect;
+        Rectangle blueguyRect;
 
         // Red Guy Controls
         Keys redguyMoveUp = Keys.W;
@@ -64,7 +73,6 @@ namespace shooter2playergame
         {
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
-            IsMouseVisible = true;
         }
 
         protected override void Initialize()
@@ -82,7 +90,9 @@ namespace shooter2playergame
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
             redguySprite = Content.Load<Texture2D>("Redguy");
+            redguySpriteDodge = Content.Load<Texture2D>("Redguydodge");
             blueguySprite = Content.Load<Texture2D>("Blueguy");
+            blueguySpriteDodge = Content.Load<Texture2D>("Blueguydodge");
             bulletSprite = Content.Load<Texture2D>("Bullet");
             MainMenuSprite = Content.Load<Texture2D>("MainMenu");
 
@@ -97,6 +107,13 @@ namespace shooter2playergame
             for(int i = 0; i < bullets.Count; i++)
             {
                 bullets[i].MoveBullet();
+            }
+
+            // Debugging position code
+            if (Keyboard.GetState().IsKeyDown(Keys.P))
+            {
+                Debug.WriteLine("RedguyPos  = " + redguyPos.X + "," + redguyPos.Y);
+                Debug.WriteLine("BlueguyPos = " + blueguyPos.X + "," + blueguyPos.Y);
             }
 
             // Menu Stuff
@@ -118,11 +135,12 @@ namespace shooter2playergame
                     gameHasStarted = true;
                 }
             }
-
-            if (Keyboard.GetState().IsKeyDown(Keys.P))
+            if (gameHasStarted == true)
             {
-                Debug.WriteLine("RedguyPos  = " + redguyPos.X + "," + redguyPos.Y);
-                Debug.WriteLine("BlueguyPos = " + blueguyPos.X + "," + blueguyPos.Y);
+                IsMouseVisible = false;
+            } else
+            {
+                IsMouseVisible = true;
             }
 
             // Red and Blue movement start
@@ -168,6 +186,7 @@ namespace shooter2playergame
                             redIsDodging = true;
                             redguyPos.Y += dodgeDistance;
                             redtimeSinceLastDodge = gameTime.TotalGameTime.TotalMilliseconds;
+                            redInvulnTimer = gameTime.TotalGameTime.TotalMilliseconds;
                             redIsDodging = false;
                         }
                         if (Keyboard.GetState().IsKeyDown(redguyDodge) && Keyboard.GetState().IsKeyDown(redguyMoveUp) && redguyPos.Y >= 42)
@@ -175,6 +194,7 @@ namespace shooter2playergame
                             redIsDodging = true;
                             redguyPos.Y -= dodgeDistance;
                             redtimeSinceLastDodge = gameTime.TotalGameTime.TotalMilliseconds;
+                            redInvulnTimer = gameTime.TotalGameTime.TotalMilliseconds;
                             redIsDodging = false;
                         }
                         if (Keyboard.GetState().IsKeyDown(redguyDodge) && Keyboard.GetState().IsKeyDown(redguyMoveRight) && redguyPos.X <= 246)
@@ -182,6 +202,7 @@ namespace shooter2playergame
                             redIsDodging = true;
                             redguyPos.X += dodgeDistance;
                             redtimeSinceLastDodge = gameTime.TotalGameTime.TotalMilliseconds;
+                            redInvulnTimer = gameTime.TotalGameTime.TotalMilliseconds;
                             redIsDodging = false;
                         }
                         if (Keyboard.GetState().IsKeyDown(redguyDodge) && Keyboard.GetState().IsKeyDown(redguyMoveLeft) && redguyPos.X >= 59)
@@ -189,6 +210,7 @@ namespace shooter2playergame
                             redIsDodging = true;
                             redguyPos.X -= dodgeDistance;
                             redtimeSinceLastDodge = gameTime.TotalGameTime.TotalMilliseconds;
+                            redInvulnTimer = gameTime.TotalGameTime.TotalMilliseconds;
                             redIsDodging = false;
                         }
                     }
@@ -234,6 +256,7 @@ namespace shooter2playergame
                             blueIsDodging = true;
                             blueguyPos.Y += dodgeDistance;
                             bluetimeSinceLastDodge = gameTime.TotalGameTime.TotalMilliseconds;
+                            blueInvulnTimer = gameTime.TotalGameTime.TotalMilliseconds;
                             blueIsDodging = false;
                         }
                         if (Keyboard.GetState().IsKeyDown(blueguyDodge) && Keyboard.GetState().IsKeyDown(blueguyMoveUp))
@@ -241,6 +264,7 @@ namespace shooter2playergame
                             blueIsDodging = true;
                             blueguyPos.Y -= dodgeDistance;
                             bluetimeSinceLastDodge = gameTime.TotalGameTime.TotalMilliseconds;
+                            blueInvulnTimer = gameTime.TotalGameTime.TotalMilliseconds;
                             blueIsDodging = false;
                         }
                         if (Keyboard.GetState().IsKeyDown(blueguyDodge) && Keyboard.GetState().IsKeyDown(blueguyMoveRight))
@@ -248,6 +272,7 @@ namespace shooter2playergame
                             blueIsDodging = true;
                             blueguyPos.X += dodgeDistance;
                             bluetimeSinceLastDodge = gameTime.TotalGameTime.TotalMilliseconds;
+                            blueInvulnTimer = gameTime.TotalGameTime.TotalMilliseconds;
                             blueIsDodging = false;
                         }
                         if (Keyboard.GetState().IsKeyDown(blueguyDodge) && Keyboard.GetState().IsKeyDown(blueguyMoveLeft))
@@ -255,6 +280,7 @@ namespace shooter2playergame
                             blueIsDodging = true;
                             blueguyPos.X -= dodgeDistance;
                             bluetimeSinceLastDodge = gameTime.TotalGameTime.TotalMilliseconds;
+                            blueInvulnTimer = gameTime.TotalGameTime.TotalMilliseconds;
                             blueIsDodging = false;
                         }
                     }
@@ -262,10 +288,37 @@ namespace shooter2playergame
             }
             // Red and Blue movement end
 
+            //Bullet & Player interactions
+            //Redguy
+            for (int i = 0; i < bullets.Count; i++)
+            {
+                if (redguyRect.Intersects(bullets[i].bulletRect)) {
+                    if (gameTime.TotalGameTime.TotalMilliseconds > redInvulnTimer + redInvulnTime)
+                    {
+                        bullets.RemoveAt(i);
+                        Debug.WriteLine("Red collision detected");
+                    }
+                }
+            }
+
+            //Blueguy
+            for (int i = 0; i < bullets.Count; i++)
+            {
+                if (blueguyRect.Intersects(bullets[i].bulletRect))
+                {
+                    if (gameTime.TotalGameTime.TotalMilliseconds > blueInvulnTimer + blueInvulnTime)
+                    {
+                        bullets.RemoveAt(i);
+                        Debug.WriteLine("Blue collision detected");
+                    }
+                }
+            }
+
             base.Update(gameTime);
         }
 
         int scale = 3;
+        
 
         protected override void Draw(GameTime gameTime)
         {
@@ -278,11 +331,29 @@ namespace shooter2playergame
                 SamplerState.PointClamp
                );
 
-            Rectangle redguyRect = new Rectangle((int)redguyPos.X, (int)redguyPos.Y, redguySprite.Width * scale, redguySprite.Height * scale);
-            Rectangle blueguyRect = new Rectangle((int)blueguyPos.X, (int)blueguyPos.Y, blueguySprite.Width * scale, blueguySprite.Height * scale);
-            _spriteBatch.Draw(redguySprite, redguyRect, Color.White);
-            _spriteBatch.Draw(blueguySprite, blueguyRect, Color.White);
+            redguyRect = new Rectangle((int)redguyPos.X, (int)redguyPos.Y, redguySprite.Width * scale, redguySprite.Height * scale);
+            blueguyRect = new Rectangle((int)blueguyPos.X, (int)blueguyPos.Y, blueguySprite.Width * scale, blueguySprite.Height * scale);
 
+            // Drawing Redguy sprites
+            if (gameTime.TotalGameTime.TotalMilliseconds > redInvulnTimer + redInvulnTime)
+            {
+                _spriteBatch.Draw(redguySprite, redguyRect, Color.White);
+
+            } else
+            {
+                _spriteBatch.Draw(redguySpriteDodge, redguyRect, Color.White);
+            }
+
+            // Drawing Blueguy sprites
+            if (gameTime.TotalGameTime.TotalMilliseconds > blueInvulnTimer + blueInvulnTime)
+            {
+                _spriteBatch.Draw(blueguySprite, blueguyRect, Color.White);
+            } else
+            {
+                _spriteBatch.Draw(blueguySpriteDodge, blueguyRect, Color.White);
+            }
+
+            // Drawing main menu
             if (isInMainMenu == true)
             {
                 _spriteBatch.Draw(MainMenuSprite, new Vector2(0, 0), Color.White);
