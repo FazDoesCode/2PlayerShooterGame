@@ -20,6 +20,7 @@ namespace shooter2playergame
         Texture2D blueguySprite;
         Texture2D blueguySpriteDodge;
         Texture2D bulletSprite;
+        Texture2D backgroundSprite;
         Vector2 redguyPos = new Vector2(100, 175);
         Vector2 blueguyPos = new Vector2(600, 175);
         SpriteFont font;
@@ -116,15 +117,13 @@ namespace shooter2playergame
             MainMenuSprite = Content.Load<Texture2D>("MainMenu");
             font = Content.Load<SpriteFont>("Fonts/Font");
             fontBold = Content.Load<SpriteFont>("Fonts/FontBold");
+            backgroundSprite = Content.Load<Texture2D>("Background");
 
             // TODO: use this.Content to load your game content here
         }
 
         protected override void Update(GameTime gameTime)
         {
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-                Exit();
-
             for(int i = 0; i < bullets.Count; i++)
             {
                 bullets[i].MoveBullet();
@@ -156,6 +155,20 @@ namespace shooter2playergame
                     gameHasStarted = true;
                 }
             }
+
+            // Exiting the game / Returning to menu
+            if (Keyboard.GetState().IsKeyDown(Keys.Escape) && gameHasStarted == true)
+            {
+                isInMainMenu = true;
+                gameHasStarted = false;
+                redScore = 0;
+                blueScore = 0;
+                redguyPos.X = 100;
+                redguyPos.Y = 175;
+                blueguyPos.X = 600;
+                blueguyPos.Y = 175;
+            }
+
             if (gameHasStarted == true)
             {
                 IsMouseVisible = false;
@@ -192,7 +205,7 @@ namespace shooter2playergame
                         {
                             if (redfireDelay == false)
                             {
-                                bullets.Add(new Bullet(bulletSprite, redguyPos + new Vector2(100, 35), new Vector2(7, 0)));
+                                bullets.Add(new Bullet(bulletSprite, redguyPos + new Vector2(50, 40), new Vector2(7, 0)));
                                 redfireDelay = true;
                             }
                         }
@@ -262,7 +275,7 @@ namespace shooter2playergame
                         {
                             if (bluefireDelay == false)
                             {
-                                bullets.Add(new Bullet(bulletSprite, blueguyPos + new Vector2(-10, 35), new Vector2(-7, 0)));
+                                bullets.Add(new Bullet(bulletSprite, blueguyPos + new Vector2(-10, 40), new Vector2(-7, 0)));
                                 bluefireDelay = true;
                             }
                         }
@@ -368,6 +381,10 @@ namespace shooter2playergame
                 SamplerState.PointClamp
                );
 
+            // Drawing background
+            _spriteBatch.Draw(backgroundSprite, new Vector2(0, 0), Color.White);
+
+            // Making redguy and blueguy rectangles
             redguyRect = new Rectangle((int)redguyPos.X, (int)redguyPos.Y, redguySprite.Width * scale, redguySprite.Height * scale);
             blueguyRect = new Rectangle((int)blueguyPos.X, (int)blueguyPos.Y, blueguySprite.Width * scale, blueguySprite.Height * scale);
 
@@ -395,7 +412,7 @@ namespace shooter2playergame
             redScoreString = redScore.ToString();
             _spriteBatch.DrawString(font, "Red Score: " + redScoreString, new Vector2(10,10), Color.Black);
             blueScoreString = blueScore.ToString();
-            _spriteBatch.DrawString(font, "Blue Score: " + blueScoreString, new Vector2(700, 10), Color.Black);
+            _spriteBatch.DrawString(font, "Blue Score: " + blueScoreString, new Vector2(680, 10), Color.Black);
 
             if (redHasScored == true)
             {
