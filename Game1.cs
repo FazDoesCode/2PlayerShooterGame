@@ -25,6 +25,8 @@ namespace shooter2playergame
         Vector2 blueguyPos = new Vector2(600, 175);
         SpriteFont font;
         SpriteFont fontBold;
+        Texture2D redguySpriteDodgeLarge;
+        Texture2D blueguySpriteDodgeLarge;
 
         // Dodging stuff
         int redDodgeDelay = 1200;
@@ -81,8 +83,8 @@ namespace shooter2playergame
         Keys blueguyMoveDown = Keys.Down;
         Keys blueguyMoveLeft = Keys.Left;
         Keys blueguyMoveRight = Keys.Right;
-        Keys blueguyShoot = Keys.OemComma;
-        Keys blueguyDodge = Keys.OemPeriod;
+        Keys blueguyShoot = Keys.OemPeriod;
+        Keys blueguyDodge = Keys.OemComma;
 
         // Blue and Red speed
         int redguySpeed = 3;
@@ -118,6 +120,8 @@ namespace shooter2playergame
             font = Content.Load<SpriteFont>("Fonts/Font");
             fontBold = Content.Load<SpriteFont>("Fonts/FontBold");
             backgroundSprite = Content.Load<Texture2D>("Background");
+            redguySpriteDodgeLarge = Content.Load<Texture2D>("Redguydodgelarge");
+            blueguySpriteDodgeLarge = Content.Load<Texture2D>("Blueguydodgelarge");
 
             // TODO: use this.Content to load your game content here
         }
@@ -185,19 +189,19 @@ namespace shooter2playergame
                     // Red movement
                     if (redIsDodging == false)
                     {
-                        if (Keyboard.GetState().IsKeyDown(redguyMoveUp) && redguyPos.Y >= 1)
+                        if (Keyboard.GetState().IsKeyDown(redguyMoveUp) && redguyPos.Y >= 5)
                         {
                             redguyPos.Y -= redguySpeed;
                         }
-                        if (Keyboard.GetState().IsKeyDown(redguyMoveDown) && redguyPos.Y <= 384)
+                        if (Keyboard.GetState().IsKeyDown(redguyMoveDown) && redguyPos.Y <= 390)
                         {
                             redguyPos.Y += redguySpeed;
                         }
-                        if (Keyboard.GetState().IsKeyDown(redguyMoveLeft) && redguyPos.X >= -2)
+                        if (Keyboard.GetState().IsKeyDown(redguyMoveLeft) && redguyPos.X >= 1)
                         {
                             redguyPos.X -= redguySpeed;
                         }
-                        if (Keyboard.GetState().IsKeyDown(redguyMoveRight) && redguyPos.X <= 292)
+                        if (Keyboard.GetState().IsKeyDown(redguyMoveRight) && redguyPos.X <= 340)
                         {
                             redguyPos.X += redguySpeed;
                         }
@@ -241,7 +245,7 @@ namespace shooter2playergame
                                 redInvulnTimer = gameTime.TotalGameTime.TotalMilliseconds;
                                 redIsDodging = false;
                             }
-                            if (Keyboard.GetState().IsKeyDown(redguyDodge) && Keyboard.GetState().IsKeyDown(redguyMoveLeft) && redguyPos.X >= 59)
+                            if (Keyboard.GetState().IsKeyDown(redguyDodge) && Keyboard.GetState().IsKeyDown(redguyMoveLeft) && redguyPos.X >= 70)
                             {
                                 redIsDodging = true;
                                 redguyPos.X -= dodgeDistance;
@@ -255,19 +259,19 @@ namespace shooter2playergame
                     // Blue movement
                     if (blueIsDodging == false)
                     {
-                        if (Keyboard.GetState().IsKeyDown(blueguyMoveUp) && blueguyPos.Y >= 1)
+                        if (Keyboard.GetState().IsKeyDown(blueguyMoveUp) && blueguyPos.Y >= 5)
                         {
                             blueguyPos.Y -= blueguySpeed;
                         }
-                        if (Keyboard.GetState().IsKeyDown(blueguyMoveDown) && blueguyPos.Y <= 384)
+                        if (Keyboard.GetState().IsKeyDown(blueguyMoveDown) && blueguyPos.Y <= 390)
                         {
                             blueguyPos.Y += blueguySpeed;
                         }
-                        if (Keyboard.GetState().IsKeyDown(blueguyMoveLeft) && blueguyPos.X >= 385)
+                        if (Keyboard.GetState().IsKeyDown(blueguyMoveLeft) && blueguyPos.X >= 395)
                         {
                             blueguyPos.X -= blueguySpeed;
                         }
-                        if (Keyboard.GetState().IsKeyDown(blueguyMoveRight) && blueguyPos.X <= 700)
+                        if (Keyboard.GetState().IsKeyDown(blueguyMoveRight) && blueguyPos.X <= 753)
                         {
                             blueguyPos.X += blueguySpeed;
                         }
@@ -287,7 +291,7 @@ namespace shooter2playergame
                         // Blue dodging
                         if (gameTime.TotalGameTime.TotalMilliseconds > bluetimeSinceLastDodge + blueDodgeDelay)
                         {
-                            if (Keyboard.GetState().IsKeyDown(blueguyDodge) && Keyboard.GetState().IsKeyDown(blueguyMoveDown))
+                            if (Keyboard.GetState().IsKeyDown(blueguyDodge) && Keyboard.GetState().IsKeyDown(blueguyMoveDown) && blueguyPos.Y <= 346)
                             {
                                 blueIsDodging = true;
                                 blueguyPos.Y += dodgeDistance;
@@ -295,7 +299,7 @@ namespace shooter2playergame
                                 blueInvulnTimer = gameTime.TotalGameTime.TotalMilliseconds;
                                 blueIsDodging = false;
                             }
-                            if (Keyboard.GetState().IsKeyDown(blueguyDodge) && Keyboard.GetState().IsKeyDown(blueguyMoveUp))
+                            if (Keyboard.GetState().IsKeyDown(blueguyDodge) && Keyboard.GetState().IsKeyDown(blueguyMoveUp) && blueguyPos.Y >= 42)
                             {
                                 blueIsDodging = true;
                                 blueguyPos.Y -= dodgeDistance;
@@ -303,7 +307,7 @@ namespace shooter2playergame
                                 blueInvulnTimer = gameTime.TotalGameTime.TotalMilliseconds;
                                 blueIsDodging = false;
                             }
-                            if (Keyboard.GetState().IsKeyDown(blueguyDodge) && Keyboard.GetState().IsKeyDown(blueguyMoveRight))
+                            if (Keyboard.GetState().IsKeyDown(blueguyDodge) && Keyboard.GetState().IsKeyDown(blueguyMoveRight) && blueguyPos.X <= 684)
                             {
                                 blueIsDodging = true;
                                 blueguyPos.X += dodgeDistance;
@@ -311,7 +315,7 @@ namespace shooter2playergame
                                 blueInvulnTimer = gameTime.TotalGameTime.TotalMilliseconds;
                                 blueIsDodging = false;
                             }
-                            if (Keyboard.GetState().IsKeyDown(blueguyDodge) && Keyboard.GetState().IsKeyDown(blueguyMoveLeft))
+                            if (Keyboard.GetState().IsKeyDown(blueguyDodge) && Keyboard.GetState().IsKeyDown(blueguyMoveLeft) && blueguyPos.X >= 450)
                             {
                                 blueIsDodging = true;
                                 blueguyPos.X -= dodgeDistance;
@@ -387,6 +391,8 @@ namespace shooter2playergame
             // Making redguy and blueguy rectangles
             redguyRect = new Rectangle((int)redguyPos.X, (int)redguyPos.Y, redguySprite.Width * scale, redguySprite.Height * scale);
             blueguyRect = new Rectangle((int)blueguyPos.X, (int)blueguyPos.Y, blueguySprite.Width * scale, blueguySprite.Height * scale);
+            Rectangle redguyDodgeRect = new Rectangle((int)redguyPos.X, (int)redguyPos.Y, redguySpriteDodgeLarge.Width * scale, redguySpriteDodgeLarge.Height * scale);
+            Rectangle blueguyDodgeRect = new Rectangle((int)blueguyPos.X, (int)blueguyPos.Y, blueguySpriteDodgeLarge.Width * scale, blueguySpriteDodgeLarge.Height * scale);
 
             // Drawing Redguy sprites
             if (gameTime.TotalGameTime.TotalMilliseconds > redInvulnTimer + redInvulnTime)
@@ -395,7 +401,7 @@ namespace shooter2playergame
             }
             else
             {
-                _spriteBatch.Draw(redguySpriteDodge, redguyRect, Color.White);
+                _spriteBatch.Draw(redguySpriteDodgeLarge, redguyDodgeRect, Color.White);
             }
 
             // Drawing Blueguy sprites
@@ -405,7 +411,7 @@ namespace shooter2playergame
             }
             else
             {
-                _spriteBatch.Draw(blueguySpriteDodge, blueguyRect, Color.White);
+                _spriteBatch.Draw(blueguySpriteDodgeLarge, blueguyDodgeRect, Color.White);
             }
 
             // Drawing Blueguy & Redguy scores
