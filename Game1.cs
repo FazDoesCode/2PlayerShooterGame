@@ -26,6 +26,7 @@ namespace shooter2playergame
         Texture2D redguySpriteDead;
         Texture2D blueguySpriteDead;
         Texture2D backgroundSprite2;
+        Texture2D controlsScreen;
 
         // Declaring fonts
         SpriteFont font;
@@ -71,10 +72,12 @@ namespace shooter2playergame
         bool overMap1Button = false;
         bool overMap2Button = false;
         bool menuMusicCanPlay = true;
+        bool overChangeControlsButton = false;
 
         // Background stuff
         bool isInDesert = false;
         bool isInForest = false;
+        bool isInControlsMenu = false;
 
         // Scoring stuff
         int redScore = 0;
@@ -154,6 +157,7 @@ namespace shooter2playergame
             deathSound = Content.Load<SoundEffect>("sound effects/deathsound");
             woosh = Content.Load<SoundEffect>("sound effects/woosh");
             backgroundSprite2 = Content.Load<Texture2D>("Backgrounds/Forestbackground");
+            controlsScreen = Content.Load<Texture2D>("Backgrounds/Controlsscreen");
 
             // TODO: use this.Content to load your game content here
         }
@@ -183,6 +187,7 @@ namespace shooter2playergame
             if (menuMusicCanPlay == true)
             {
                 MediaPlayer.Play(menuMusic);
+                MediaPlayer.Volume = 0.4f;
                 MediaPlayer.IsRepeating = true;
                 menuMusicCanPlay = false;
             }
@@ -207,28 +212,47 @@ namespace shooter2playergame
             {
                 overMap2Button = false;
             }
+            if (isInControlsMenu == true && mouseState.X > 282 && mouseState.X < 490 && mouseState.Y < 80)
+            {
+                overChangeControlsButton = true;
+            } else
+            {
+                overChangeControlsButton = false;
+            }
             
-            if (overMap1Button == true && mouseState.LeftButton == ButtonState.Pressed)
+            if (overMap1Button == true && mouseState.LeftButton == ButtonState.Pressed && isInMainMenu == true)
             {
                 isInMainMenu = false;
                 isInDesert = true;
                 gameHasStarted = true;
                 MediaPlayer.Stop();
             }
-            if (overMap2Button == true && mouseState.LeftButton == ButtonState.Pressed)
+            if (overMap2Button == true && mouseState.LeftButton == ButtonState.Pressed && isInMainMenu == true)
             {
                 isInMainMenu = false;
                 isInForest = true;
                 gameHasStarted = true;
                 MediaPlayer.Stop();
             }
+            if (overControlsButton == true && mouseState.LeftButton == ButtonState.Pressed && isInMainMenu == true)
+            {
+                isInMainMenu = false;
+                isInControlsMenu = true;
+                MediaPlayer.Stop();
+            }
+            if (overChangeControlsButton == true && mouseState.LeftButton == ButtonState.Pressed && isInControlsMenu == true)
+            {
+                
+            }
 
             // Exiting the game / Returning to menu
-            if (Keyboard.GetState().IsKeyDown(Keys.Escape) && gameHasStarted == true)
+            if (Keyboard.GetState().IsKeyDown(Keys.Escape) && gameHasStarted == true || Keyboard.GetState().IsKeyDown(Keys.Escape) && isInControlsMenu == true)
             {
+                bullets.Clear();
                 isInMainMenu = true;
                 isInDesert = false;
                 isInForest = false;
+                isInControlsMenu = false;
                 gameHasStarted = false;
                 menuMusicCanPlay = true;
                 redScore = 0;
@@ -578,6 +602,12 @@ namespace shooter2playergame
             for (int i = 0; i < bullets.Count; i++)
             {
                 bullets[i].Draw(_spriteBatch);
+            }
+
+            // Drawing controls menu
+            if (isInControlsMenu == true)
+            {
+                _spriteBatch.Draw(controlsScreen, new Vector2(0, 0), Color.White);
             }
 
             _spriteBatch.End();
