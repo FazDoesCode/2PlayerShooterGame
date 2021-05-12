@@ -39,6 +39,7 @@ namespace shooter2playergame
         SoundEffect woosh;
         SoundEffect deathSound;
         Song menuMusic;
+        Song controlsScreenMusic;
 
         // Position & walking stuff
         Vector2 redguyPos = new Vector2(100, 175);
@@ -78,6 +79,7 @@ namespace shooter2playergame
         bool isInDesert = false;
         bool isInForest = false;
         bool isInControlsMenu = false;
+        bool controlsMusicCanPlay = false;
 
         // Scoring stuff
         int redScore = 0;
@@ -127,45 +129,54 @@ namespace shooter2playergame
 
         protected override void Initialize()
         {
-            // TODO: Add your initialization logic here
-
             Debug.WriteLine(GraphicsDevice.Viewport.Bounds);
-
-
             base.Initialize();
         }
 
         protected override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
-
+           
+            // Loading player sprites
             redguySprite = Content.Load<Texture2D>("Players/Redguy");
             blueguySprite = Content.Load<Texture2D>("Players/Blueguy");
-            bulletSprite = Content.Load<Texture2D>("Items/Bullet");
-            MainMenuSprite = Content.Load<Texture2D>("Backgrounds/MainMenu");
-            font = Content.Load<SpriteFont>("Fonts/Font");
-            fontBold = Content.Load<SpriteFont>("Fonts/FontBold");
-            backgroundSprite = Content.Load<Texture2D>("Backgrounds/Desertbackground");
             redguySpriteDodgeLarge = Content.Load<Texture2D>("Players/Redguydodgelarge");
             blueguySpriteDodgeLarge = Content.Load<Texture2D>("Players/Blueguydodgelarge");
             redguySpriteDead = Content.Load<Texture2D>("Players/Redguydead");
             blueguySpriteDead = Content.Load<Texture2D>("Players/Blueguydead");
+
+            // Loading miscellaneous sprites
+            bulletSprite = Content.Load<Texture2D>("Items/Bullet");
+
+            // Loading menu sprites
+            MainMenuSprite = Content.Load<Texture2D>("Backgrounds/MainMenu");
+            controlsScreen = Content.Load<Texture2D>("Backgrounds/Controlsscreen");
+
+            // Loading gameplay backgrounds
+            backgroundSprite = Content.Load<Texture2D>("Backgrounds/Desertbackground");
+            backgroundSprite2 = Content.Load<Texture2D>("Backgrounds/Forestbackground");
+
+            // Loading fonts
+            font = Content.Load<SpriteFont>("Fonts/Font");
+            fontBold = Content.Load<SpriteFont>("Fonts/FontBold");
+
+            // Loading music
             menuMusic = Content.Load<Song>("music/menumusic");
+            controlsScreenMusic = Content.Load<Song>("music/controlsscreenmusic");
+
+            // Loading sound effects
             pew = Content.Load<SoundEffect>("sound effects/pew");
             bang = Content.Load<SoundEffect>("sound effects/bang");
             walkSound = Content.Load<SoundEffect>("sound effects/walksound");
             deathSound = Content.Load<SoundEffect>("sound effects/deathsound");
             woosh = Content.Load<SoundEffect>("sound effects/woosh");
-            backgroundSprite2 = Content.Load<Texture2D>("Backgrounds/Forestbackground");
-            controlsScreen = Content.Load<Texture2D>("Backgrounds/Controlsscreen");
-
-            // TODO: use this.Content to load your game content here
         }
 
         protected override void Update(GameTime gameTime)
         {
             MouseState mouseState = Mouse.GetState();
 
+            // Moving bullets forwards / backwards
             for (int i = 0; i < bullets.Count; i++)
             {
                 bullets[i].MoveBullet();
@@ -190,6 +201,13 @@ namespace shooter2playergame
                 MediaPlayer.Volume = 0.4f;
                 MediaPlayer.IsRepeating = true;
                 menuMusicCanPlay = false;
+            }
+            if (controlsMusicCanPlay == true)
+            {
+                MediaPlayer.Play(controlsScreenMusic);
+                MediaPlayer.Volume = 0.4f;
+                MediaPlayer.IsRepeating = true;
+                controlsMusicCanPlay = false;
             }
             if (mouseState.X < 200 && mouseState.Y > 405)
             {
@@ -239,6 +257,7 @@ namespace shooter2playergame
                 isInMainMenu = false;
                 isInControlsMenu = true;
                 MediaPlayer.Stop();
+                controlsMusicCanPlay = true;
             }
             if (overChangeControlsButton == true && mouseState.LeftButton == ButtonState.Pressed && isInControlsMenu == true)
             {
@@ -248,6 +267,7 @@ namespace shooter2playergame
             // Exiting the game / Returning to menu
             if (Keyboard.GetState().IsKeyDown(Keys.Escape) && gameHasStarted == true || Keyboard.GetState().IsKeyDown(Keys.Escape) && isInControlsMenu == true)
             {
+                MediaPlayer.Stop();
                 bullets.Clear();
                 isInMainMenu = true;
                 isInDesert = false;
@@ -257,10 +277,7 @@ namespace shooter2playergame
                 menuMusicCanPlay = true;
                 redScore = 0;
                 blueScore = 0;
-                redguyPos.X = 100;
-                redguyPos.Y = 175;
-                blueguyPos.X = 600;
-                blueguyPos.Y = 175;
+                ResetPos();
             }
 
             if (gameHasStarted == true)
@@ -516,8 +533,6 @@ namespace shooter2playergame
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
-
-            // TODO: Add your drawing code here
 
             _spriteBatch.Begin(SpriteSortMode.Deferred,
                 BlendState.AlphaBlend,

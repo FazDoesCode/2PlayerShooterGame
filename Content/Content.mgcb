@@ -99,6 +99,12 @@
 /processorParam:TextureFormat=Color
 /build:Items/crate.png
 
+#begin music/controlsscreenmusic.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:music/controlsscreenmusic.mp3
+
 #begin music/menumusic.mp3
 /importer:Mp3Importer
 /processor:SongProcessor
