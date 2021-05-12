@@ -25,6 +25,7 @@ namespace shooter2playergame
         Texture2D blueguySpriteDodgeLarge;
         Texture2D redguySpriteDead;
         Texture2D blueguySpriteDead;
+        Texture2D backgroundSprite2;
 
         // Declaring fonts
         SpriteFont font;
@@ -37,9 +38,6 @@ namespace shooter2playergame
         SoundEffect woosh;
         SoundEffect deathSound;
         Song menuMusic;
-
-        // Extra main menu stuff
-        bool menuMusicCanPlay = true;
 
         // Position & walking stuff
         Vector2 redguyPos = new Vector2(100, 175);
@@ -69,7 +67,14 @@ namespace shooter2playergame
         // Main menu stuff
         bool isInMainMenu = true;
         bool gameHasStarted = false;
-        bool overCreditsButton = false;
+        bool overControlsButton = false;
+        bool overMap1Button = false;
+        bool overMap2Button = false;
+        bool menuMusicCanPlay = true;
+
+        // Background stuff
+        bool isInDesert = false;
+        bool isInForest = false;
 
         // Scoring stuff
         int redScore = 0;
@@ -137,7 +142,7 @@ namespace shooter2playergame
             MainMenuSprite = Content.Load<Texture2D>("Backgrounds/MainMenu");
             font = Content.Load<SpriteFont>("Fonts/Font");
             fontBold = Content.Load<SpriteFont>("Fonts/FontBold");
-            backgroundSprite = Content.Load<Texture2D>("Backgrounds/Background");
+            backgroundSprite = Content.Load<Texture2D>("Backgrounds/Desertbackground");
             redguySpriteDodgeLarge = Content.Load<Texture2D>("Players/Redguydodgelarge");
             blueguySpriteDodgeLarge = Content.Load<Texture2D>("Players/Blueguydodgelarge");
             redguySpriteDead = Content.Load<Texture2D>("Players/Redguydead");
@@ -148,6 +153,7 @@ namespace shooter2playergame
             walkSound = Content.Load<SoundEffect>("sound effects/walksound");
             deathSound = Content.Load<SoundEffect>("sound effects/deathsound");
             woosh = Content.Load<SoundEffect>("sound effects/woosh");
+            backgroundSprite2 = Content.Load<Texture2D>("Backgrounds/Forestbackground");
 
             // TODO: use this.Content to load your game content here
         }
@@ -180,29 +186,49 @@ namespace shooter2playergame
                 MediaPlayer.IsRepeating = true;
                 menuMusicCanPlay = false;
             }
-            if (mouseState.X < 292 && mouseState.Y > 370)
+            if (mouseState.X < 200 && mouseState.Y > 405)
             {
-                overCreditsButton = true;
+                overControlsButton = true;
+            } else
+            {
+                overControlsButton = false;
             }
-            else
+            if (mouseState.X > 591 && mouseState.Y < 80)
             {
-                overCreditsButton = false;
+                overMap1Button = true;
+            } else
+            {
+                overMap1Button = false;
             }
-
-            if (overCreditsButton == false)
+            if (mouseState.X > 591 && mouseState.Y < 161 && mouseState.Y > 85)
             {
-                if (mouseState.LeftButton == ButtonState.Pressed)
-                {
-                    isInMainMenu = false;
-                    gameHasStarted = true;
-                    MediaPlayer.Stop();
-                }
+                overMap2Button = true;
+            } else
+            {
+                overMap2Button = false;
+            }
+            
+            if (overMap1Button == true && mouseState.LeftButton == ButtonState.Pressed)
+            {
+                isInMainMenu = false;
+                isInDesert = true;
+                gameHasStarted = true;
+                MediaPlayer.Stop();
+            }
+            if (overMap2Button == true && mouseState.LeftButton == ButtonState.Pressed)
+            {
+                isInMainMenu = false;
+                isInForest = true;
+                gameHasStarted = true;
+                MediaPlayer.Stop();
             }
 
             // Exiting the game / Returning to menu
             if (Keyboard.GetState().IsKeyDown(Keys.Escape) && gameHasStarted == true)
             {
                 isInMainMenu = true;
+                isInDesert = false;
+                isInForest = false;
                 gameHasStarted = false;
                 menuMusicCanPlay = true;
                 redScore = 0;
@@ -475,7 +501,14 @@ namespace shooter2playergame
                );
 
             // Drawing background
-            _spriteBatch.Draw(backgroundSprite, new Vector2(0, 0), Color.White);
+            if (isInDesert == true)
+            {
+                _spriteBatch.Draw(backgroundSprite, new Vector2(0, 0), Color.White);
+            }
+            if (isInForest == true)
+            {
+                _spriteBatch.Draw(backgroundSprite2, new Vector2(0, 0), Color.White);
+            }
 
             // Making redguy and blueguy rectangles
             redguyRect = new Rectangle((int)redguyPos.X, (int)redguyPos.Y, redguySprite.Width * scale, redguySprite.Height * scale);
