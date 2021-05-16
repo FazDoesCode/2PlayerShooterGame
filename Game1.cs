@@ -27,6 +27,7 @@ namespace shooter2playergame
         Texture2D blueguySpriteDead;
         Texture2D backgroundSprite2;
         Texture2D controlsScreen;
+        Texture2D powerupSprite;
 
         // Declaring fonts
         SpriteFont font;
@@ -43,24 +44,24 @@ namespace shooter2playergame
 
         // Position & walking stuff
         Vector2 redguyPos = new Vector2(100, 175);
-        Vector2 blueguyPos = new Vector2(600, 175);
+        Vector2 blueguyPos = new Vector2(600, 175); // Sets redguy and blueguy's default position
         double redTimeSinceLastWalked = 0;
         double blueTimeSinceLastWalked = 0;
-        int walkSoundDelay = 400;
+        int walkSoundDelay = 400; // These are used to make walk sounds better
 
         // Dodging stuff
-        int redDodgeDelay = 1200;
-        int redInvulnTime = 500;
+        int redDodgeDelay = 1200; // Red has 1.2 seconds of time between dodges, same as blue
+        int redInvulnTime = 500; // Only 500ms of invincibility
         double redtimeSinceLastDodge = 0;
-        double redInvulnTimer = 0;
+        double redInvulnTimer = 0; // These are used in the dodge timer
         
-        int blueDodgeDelay = 1200;
+        int blueDodgeDelay = 1200; // All the same as red, however kept seperate so the dodge powerup can only effect the one who picked it up
         int blueInvulnTime = 500;
         double bluetimeSinceLastDodge = 0;
         double blueInvulnTimer = 0;
 
         // Firing Stuff
-        bool redfireDelay = false;
+        bool redfireDelay = false; // booleans used to determine whether or not red or blue can fire
         bool redIsDodging = false;
 
         bool bluefireDelay = false;
@@ -68,33 +69,51 @@ namespace shooter2playergame
 
         // Main menu stuff
         bool isInMainMenu = true;
-        bool gameHasStarted = false;
+        public bool gameHasStarted = false; // Also used to determine whether or not the players can move
         bool overControlsButton = false;
         bool overMap1Button = false;
-        bool overMap2Button = false;
+        bool overMap2Button = false; // Used for the button selection
         bool menuMusicCanPlay = true;
-        bool overChangeControlsButton = false;
 
         // Background stuff
         bool isInDesert = false;
         bool isInForest = false;
-        bool isInControlsMenu = false;
+        bool isInControlsMenu = false; // Used to determine what background is displayed
         bool controlsMusicCanPlay = false;
 
         // Scoring stuff
         int redScore = 0;
-        int blueScore = 0;
+        int blueScore = 0; // Default red and blue scores are 0, obviously
         string redScoreString;
-        string blueScoreString;
+        string blueScoreString; // Used to convert the ints into strings so that they can be displayed through text
         bool redHasScored = false;
-        bool blueHasScored = false;
+        bool blueHasScored = false; // Used to stop the characters from moving after a point is scored
 
-        int scoreDelay  = 2000;
+        int scoreDelay  = 2000; // How long the 'Red Scored!' or 'Blue Scored' screen stays up for
         double redTimeSinceLastScore = 0;
         double blueTimeSinceLastScore = 0;
 
-        // Listing bullets
+        // WORK ON THIS
+        // Powerup Stuff
+        double timeSinceLastSpawnRED = 0;
+        double timeSinceLastSpawnBLUE = 0;
+
+        int REDspawnDelay = new Random().Next(15000, 25000);
+        int BLUEspawnDelay = new Random().Next(15000, 25000);
+        int randomPositionREDX = new Random().Next(220, 380);
+        int randomPositionREDY = new Random().Next(30, 460);
+        int randomPositionBLUEX = new Random().Next(440, 560);
+        int randomPositionBLUEY = new Random().Next(30, 460);
+
+        // Japanese mode stuff (Secret so don't tell anyone ok)
+        Texture2D japaneseMenu;
+        Song japaneseMusic;
+        bool isInJapan = false;
+        bool japanMusicCanPlay = false;
+
+        // Listing bullets & powerups
         List<Bullet> bullets = new List<Bullet>();
+        List<DashPowerup> powerups = new List<DashPowerup>();
 
         // Declaring rectangle so I can use it in collisions
         Rectangle redguyRect;
@@ -147,10 +166,12 @@ namespace shooter2playergame
 
             // Loading miscellaneous sprites
             bulletSprite = Content.Load<Texture2D>("Items/Bullet");
+            powerupSprite = Content.Load<Texture2D>("Items/speedpill");
 
             // Loading menu sprites
             MainMenuSprite = Content.Load<Texture2D>("Backgrounds/MainMenu");
             controlsScreen = Content.Load<Texture2D>("Backgrounds/Controlsscreen");
+            japaneseMenu = Content.Load<Texture2D>("Backgrounds/Japanesemenu");
 
             // Loading gameplay backgrounds
             backgroundSprite = Content.Load<Texture2D>("Backgrounds/Desertbackground");
@@ -163,6 +184,7 @@ namespace shooter2playergame
             // Loading music
             menuMusic = Content.Load<Song>("music/menumusic");
             controlsScreenMusic = Content.Load<Song>("music/controlsscreenmusic");
+            japaneseMusic = Content.Load<Song>("music/japanesemusic");
 
             // Loading sound effects
             pew = Content.Load<SoundEffect>("sound effects/pew");
@@ -179,42 +201,28 @@ namespace shooter2playergame
             // Moving bullets forwards / backwards
             for (int i = 0; i < bullets.Count; i++)
             {
-                bullets[i].MoveBullet();
+                bullets[i].MoveBullet(); // Calls the MoveBullet() function for every bullet in the list
             }
 
             // Debugging position code
             if (Keyboard.GetState().IsKeyDown(Keys.P))
             {
                 Debug.WriteLine("RedguyPos  = " + redguyPos.X + "," + redguyPos.Y);
-                Debug.WriteLine("BlueguyPos = " + blueguyPos.X + "," + blueguyPos.Y);
+                Debug.WriteLine("BlueguyPos = " + blueguyPos.X + "," + blueguyPos.Y); // Used for debugging player position
             }
             if (mouseState.RightButton == ButtonState.Pressed)
             {
                 Debug.WriteLine(mouseState.X);
-                Debug.WriteLine(mouseState.Y);
+                Debug.WriteLine(mouseState.Y); // Used for debugging mouse position (for the menus)
             }
 
-            // Menu Stuff
+            // Main Menu Stuff
             if (menuMusicCanPlay == true)
             {
                 MediaPlayer.Play(menuMusic);
                 MediaPlayer.Volume = 0.4f;
                 MediaPlayer.IsRepeating = true;
-                menuMusicCanPlay = false;
-            }
-            if (controlsMusicCanPlay == true)
-            {
-                MediaPlayer.Play(controlsScreenMusic);
-                MediaPlayer.Volume = 0.4f;
-                MediaPlayer.IsRepeating = true;
-                controlsMusicCanPlay = false;
-            }
-            if (mouseState.X < 200 && mouseState.Y > 405)
-            {
-                overControlsButton = true;
-            } else
-            {
-                overControlsButton = false;
+                menuMusicCanPlay = false; // Makes the menu music play once instead of constantly starting
             }
             if (mouseState.X > 591 && mouseState.Y < 80)
             {
@@ -230,14 +238,6 @@ namespace shooter2playergame
             {
                 overMap2Button = false;
             }
-            if (isInControlsMenu == true && mouseState.X > 282 && mouseState.X < 490 && mouseState.Y < 80)
-            {
-                overChangeControlsButton = true;
-            } else
-            {
-                overChangeControlsButton = false;
-            }
-            
             if (overMap1Button == true && mouseState.LeftButton == ButtonState.Pressed && isInMainMenu == true)
             {
                 isInMainMenu = false;
@@ -252,6 +252,23 @@ namespace shooter2playergame
                 gameHasStarted = true;
                 MediaPlayer.Stop();
             }
+            
+            // Controls Menu Stuff
+            if (controlsMusicCanPlay == true)
+            {
+                MediaPlayer.Play(controlsScreenMusic);
+                MediaPlayer.Volume = 0.4f;
+                MediaPlayer.IsRepeating = true;
+                controlsMusicCanPlay = false;
+            }
+            if (mouseState.X < 200 && mouseState.Y > 405)
+            {
+                overControlsButton = true;
+            }
+            else
+            {
+                overControlsButton = false;
+            }
             if (overControlsButton == true && mouseState.LeftButton == ButtonState.Pressed && isInMainMenu == true)
             {
                 isInMainMenu = false;
@@ -259,13 +276,25 @@ namespace shooter2playergame
                 MediaPlayer.Stop();
                 controlsMusicCanPlay = true;
             }
-            if (overChangeControlsButton == true && mouseState.LeftButton == ButtonState.Pressed && isInControlsMenu == true)
+
+            // Japanese mode stuff
+            if (Keyboard.GetState().IsKeyDown(Keys.A) && Keyboard.GetState().IsKeyDown(Keys.N) && Keyboard.GetState().IsKeyDown(Keys.I) && Keyboard.GetState().IsKeyDown(Keys.M) && Keyboard.GetState().IsKeyDown(Keys.E) && isInMainMenu == true)
             {
-                
+                isInMainMenu = false;
+                isInJapan = true;
+                MediaPlayer.Stop();
+                japanMusicCanPlay = true;
+            }
+            if (japanMusicCanPlay == true)
+            {
+                MediaPlayer.Play(japaneseMusic);
+                MediaPlayer.Volume = 0.4f;
+                MediaPlayer.IsRepeating = true;
+                japanMusicCanPlay = false;
             }
 
             // Exiting the game / Returning to menu
-            if (Keyboard.GetState().IsKeyDown(Keys.Escape) && gameHasStarted == true || Keyboard.GetState().IsKeyDown(Keys.Escape) && isInControlsMenu == true)
+            if (Keyboard.GetState().IsKeyDown(Keys.Escape) && gameHasStarted == true || Keyboard.GetState().IsKeyDown(Keys.Escape) && isInControlsMenu == true || Keyboard.GetState().IsKeyDown(Keys.Escape) && isInJapan == true)
             {
                 MediaPlayer.Stop();
                 bullets.Clear();
@@ -273,11 +302,12 @@ namespace shooter2playergame
                 isInDesert = false;
                 isInForest = false;
                 isInControlsMenu = false;
+                isInJapan = false;
                 gameHasStarted = false;
                 menuMusicCanPlay = true;
                 redScore = 0;
                 blueScore = 0;
-                ResetPos();
+                ResetPos(); // Basically resets everything and returns to main menu
             }
 
             if (gameHasStarted == true)
@@ -285,7 +315,7 @@ namespace shooter2playergame
                 IsMouseVisible = false;
             } else
             {
-                IsMouseVisible = true;
+               IsMouseVisible = true;
             }
 
             // Red and Blue movement start
@@ -517,6 +547,21 @@ namespace shooter2playergame
                     }
                 }
             }
+
+            // WORK ON THIS
+            // Powerup stuff
+            if (gameHasStarted == false)
+            {
+                timeSinceLastSpawnRED = 0;
+                timeSinceLastSpawnBLUE = 0;
+            }
+
+            if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastSpawnRED + REDspawnDelay)
+            {
+                powerups.Add(new DashPowerup(powerupSprite, new Vector2(randomPositionREDX, randomPositionREDY)));
+                Debug.WriteLine("powerup spawned");
+            }
+
             base.Update(gameTime);
         }
 
@@ -555,56 +600,62 @@ namespace shooter2playergame
             Rectangle redguyDodgeRect = new Rectangle((int)redguyPos.X, (int)redguyPos.Y, redguySpriteDodgeLarge.Width * scale, redguySpriteDodgeLarge.Height * scale);
             Rectangle blueguyDodgeRect = new Rectangle((int)blueguyPos.X, (int)blueguyPos.Y, blueguySpriteDodgeLarge.Width * scale, blueguySpriteDodgeLarge.Height * scale);
 
-            // Drawing Redguy sprites
-            if (blueHasScored == false)
+            if (gameHasStarted == true)
             {
-                if (gameTime.TotalGameTime.TotalMilliseconds > redInvulnTimer + redInvulnTime)
+                // Drawing Redguy sprites
+                if (blueHasScored == false)
                 {
-                    _spriteBatch.Draw(redguySprite, redguyRect, Color.White);
+                    if (gameTime.TotalGameTime.TotalMilliseconds > redInvulnTimer + redInvulnTime)
+                    {
+                        _spriteBatch.Draw(redguySprite, redguyRect, Color.White);
+                    }
+                    else
+                    {
+                        _spriteBatch.Draw(redguySpriteDodgeLarge, redguyDodgeRect, Color.White);
+                    }
                 }
-                else
+
+                // Drawing Blueguy sprites
+                if (redHasScored == false)
                 {
-                    _spriteBatch.Draw(redguySpriteDodgeLarge, redguyDodgeRect, Color.White);
+                    if (gameTime.TotalGameTime.TotalMilliseconds > blueInvulnTimer + blueInvulnTime)
+                    {
+                        _spriteBatch.Draw(blueguySprite, blueguyRect, Color.White);
+                    }
+                    else
+                    {
+                        _spriteBatch.Draw(blueguySpriteDodgeLarge, blueguyDodgeRect, Color.White);
+                    }
                 }
             }
 
-            // Drawing Blueguy sprites
-            if (redHasScored == false)
+            if (gameHasStarted == true)
             {
-                if (gameTime.TotalGameTime.TotalMilliseconds > blueInvulnTimer + blueInvulnTime)
-                {
-                    _spriteBatch.Draw(blueguySprite, blueguyRect, Color.White);
-                }
-                else
-                {
-                    _spriteBatch.Draw(blueguySpriteDodgeLarge, blueguyDodgeRect, Color.White);
-                }
-            }
+                // Drawing Blueguy & Redguy scores
+                redScoreString = redScore.ToString();
+                _spriteBatch.DrawString(font, "Red Score: " + redScoreString, new Vector2(10, 10), Color.Black);
+                blueScoreString = blueScore.ToString();
+                _spriteBatch.DrawString(font, "Blue Score: " + blueScoreString, new Vector2(680, 10), Color.Black);
 
-            // Drawing Blueguy & Redguy scores
-            redScoreString = redScore.ToString();
-            _spriteBatch.DrawString(font, "Red Score: " + redScoreString, new Vector2(10,10), Color.Black);
-            blueScoreString = blueScore.ToString();
-            _spriteBatch.DrawString(font, "Blue Score: " + blueScoreString, new Vector2(680, 10), Color.Black);
-
-            if (redHasScored == true)
-            {
-                _spriteBatch.Draw(blueguySpriteDead, blueguyRect, Color.White);
-                _spriteBatch.DrawString(fontBold, "Red Scored!", new Vector2(330, 215), Color.Black);
-                if (gameTime.TotalGameTime.TotalMilliseconds > redTimeSinceLastScore + scoreDelay)
+                if (redHasScored == true)
                 {
-                    redHasScored = false;
-                    ResetPos();
+                    _spriteBatch.Draw(blueguySpriteDead, blueguyRect, Color.White);
+                    _spriteBatch.DrawString(fontBold, "Red Scored!", new Vector2(330, 215), Color.Black);
+                    if (gameTime.TotalGameTime.TotalMilliseconds > redTimeSinceLastScore + scoreDelay)
+                    {
+                        redHasScored = false;
+                        ResetPos();
+                    }
                 }
-            }
-            if (blueHasScored == true)
-            {
-                _spriteBatch.Draw(redguySpriteDead, redguyRect, Color.White);
-                _spriteBatch.DrawString(fontBold, "Blue Scored!", new Vector2(330, 215), Color.Black);
-                if (gameTime.TotalGameTime.TotalMilliseconds > blueTimeSinceLastScore + scoreDelay)
+                if (blueHasScored == true)
                 {
-                    blueHasScored = false;
-                    ResetPos();
+                    _spriteBatch.Draw(redguySpriteDead, redguyRect, Color.White);
+                    _spriteBatch.DrawString(fontBold, "Blue Scored!", new Vector2(330, 215), Color.Black);
+                    if (gameTime.TotalGameTime.TotalMilliseconds > blueTimeSinceLastScore + scoreDelay)
+                    {
+                        blueHasScored = false;
+                        ResetPos();
+                    }
                 }
             }
 
@@ -623,6 +674,12 @@ namespace shooter2playergame
             if (isInControlsMenu == true)
             {
                 _spriteBatch.Draw(controlsScreen, new Vector2(0, 0), Color.White);
+            }
+            
+            // Drawing japanese stuff
+            if (isInJapan == true)
+            {
+                _spriteBatch.Draw(japaneseMenu, new Vector2(0, 0), Color.White);
             }
 
             _spriteBatch.End();

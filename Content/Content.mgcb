@@ -49,6 +49,18 @@
 /processorParam:TextureFormat=Color
 /build:Backgrounds/Forestbackground.png
 
+#begin Backgrounds/Japanesemenu.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Backgrounds/Japanesemenu.png
+
 #begin Backgrounds/MainMenu.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -99,11 +111,29 @@
 /processorParam:TextureFormat=Color
 /build:Items/crate.png
 
+#begin Items/speedpill.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Items/speedpill.png
+
 #begin music/controlsscreenmusic.mp3
 /importer:Mp3Importer
 /processor:SongProcessor
 /processorParam:Quality=Best
 /build:music/controlsscreenmusic.mp3
+
+#begin music/japanesemusic.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:music/japanesemusic.mp3
 
 #begin music/menumusic.mp3
 /importer:Mp3Importer
