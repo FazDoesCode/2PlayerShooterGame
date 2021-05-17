@@ -62,7 +62,7 @@ namespace shooter2playergame
 
         // Firing Stuff
         bool redfireDelay = false; // booleans used to determine whether or not red or blue can fire
-        bool redIsDodging = false;
+        bool redIsDodging = false; // This is used to stop dodge spam
 
         bool bluefireDelay = false;
         bool blueIsDodging = false;
@@ -71,14 +71,14 @@ namespace shooter2playergame
         bool isInMainMenu = true;
         public bool gameHasStarted = false; // Also used to determine whether or not the players can move
         bool overControlsButton = false;
-        bool overMap1Button = false;
+        bool overMap1Button = false; // Used for button selection
         bool overMap2Button = false; // Used for the button selection
-        bool menuMusicCanPlay = true;
+        bool menuMusicCanPlay = true; // self explanitory
 
         // Background stuff
         bool isInDesert = false;
         bool isInForest = false;
-        bool isInControlsMenu = false; // Used to determine what background is displayed
+        bool isInControlsMenu = false; // These are used to determine what background is displayed
         bool controlsMusicCanPlay = false;
 
         // Scoring stuff
@@ -93,17 +93,20 @@ namespace shooter2playergame
         double redTimeSinceLastScore = 0;
         double blueTimeSinceLastScore = 0;
 
-        // WORK ON THIS
         // Powerup Stuff
         double timeSinceLastSpawnRED = 0;
-        double timeSinceLastSpawnBLUE = 0;
+        double timeSinceLastSpawnBLUE = 0; // Used as timers
 
-        int REDspawnDelay = new Random().Next(15000, 25000);
-        int BLUEspawnDelay = new Random().Next(15000, 25000);
+        int REDspawnDelay = new Random().Next(7000, 15000);
+        int BLUEspawnDelay = new Random().Next(7000, 15000); // These set a random number between 7 second and 15 seconds, used to spawn the powerups
         int randomPositionREDX = new Random().Next(220, 380);
         int randomPositionREDY = new Random().Next(30, 460);
         int randomPositionBLUEX = new Random().Next(440, 560);
-        int randomPositionBLUEY = new Random().Next(30, 460);
+        int randomPositionBLUEY = new Random().Next(30, 460); // These are used to set a random spawn location
+
+        double REDpowerupTimer = 0;
+        double BLUEpowerupTimer = 0;
+        int powerupTime = 5000; // The powerups are active for 5 seconds
 
         // Japanese mode stuff (Secret so don't tell anyone ok)
         Texture2D japaneseMenu;
@@ -113,7 +116,7 @@ namespace shooter2playergame
 
         // Listing bullets & powerups
         List<Bullet> bullets = new List<Bullet>();
-        List<DashPowerup> powerups = new List<DashPowerup>();
+        List<DashPowerup> powerups = new List<DashPowerup>(); // Using lists so there can be multiple on screen
 
         // Declaring rectangle so I can use it in collisions
         Rectangle redguyRect;
@@ -137,7 +140,7 @@ namespace shooter2playergame
 
         // Blue and Red speed
         int redguySpeed = 3;
-        int blueguySpeed = 3;
+        int blueguySpeed = 3; // Red and blueguy speed are seperate integers so they can be affected by powerups seperately
         int dodgeDistance = 60;
 
         public Game1()
@@ -148,7 +151,6 @@ namespace shooter2playergame
 
         protected override void Initialize()
         {
-            Debug.WriteLine(GraphicsDevice.Viewport.Bounds);
             base.Initialize();
         }
 
@@ -160,13 +162,13 @@ namespace shooter2playergame
             redguySprite = Content.Load<Texture2D>("Players/Redguy");
             blueguySprite = Content.Load<Texture2D>("Players/Blueguy");
             redguySpriteDodgeLarge = Content.Load<Texture2D>("Players/Redguydodgelarge");
-            blueguySpriteDodgeLarge = Content.Load<Texture2D>("Players/Blueguydodgelarge");
+            blueguySpriteDodgeLarge = Content.Load<Texture2D>("Players/Blueguydodgelarge"); // The sprites are 'Large' due to me fixing a bug with the old ones and never changing the new filenames
             redguySpriteDead = Content.Load<Texture2D>("Players/Redguydead");
             blueguySpriteDead = Content.Load<Texture2D>("Players/Blueguydead");
 
             // Loading miscellaneous sprites
             bulletSprite = Content.Load<Texture2D>("Items/Bullet");
-            powerupSprite = Content.Load<Texture2D>("Items/speedpill");
+            powerupSprite = Content.Load<Texture2D>("Items/Fastshoe");
 
             // Loading menu sprites
             MainMenuSprite = Content.Load<Texture2D>("Backgrounds/MainMenu");
@@ -224,36 +226,36 @@ namespace shooter2playergame
                 MediaPlayer.IsRepeating = true;
                 menuMusicCanPlay = false; // Makes the menu music play once instead of constantly starting
             }
-            if (mouseState.X > 591 && mouseState.Y < 80)
+            if (mouseState.X > 591 && mouseState.Y < 80) 
             {
                 overMap1Button = true;
             } else
             {
                 overMap1Button = false;
-            }
-            if (mouseState.X > 591 && mouseState.Y < 161 && mouseState.Y > 85)
+            } // if the mouse is in the set box it's in the map 1 button
+            if (mouseState.X > 591 && mouseState.Y < 161 && mouseState.Y > 85) 
             {
                 overMap2Button = true;
             } else
             {
                 overMap2Button = false;
-            }
+            } // If the mouse is in the set box it's over the map2 button
             if (overMap1Button == true && mouseState.LeftButton == ButtonState.Pressed && isInMainMenu == true)
             {
                 isInMainMenu = false;
                 isInDesert = true;
                 gameHasStarted = true;
-                MediaPlayer.Stop();
+                MediaPlayer.Stop(); // Sets the background to the desert and stops playing music
             }
             if (overMap2Button == true && mouseState.LeftButton == ButtonState.Pressed && isInMainMenu == true)
             {
                 isInMainMenu = false;
                 isInForest = true;
                 gameHasStarted = true;
-                MediaPlayer.Stop();
+                MediaPlayer.Stop(); // Sets the background to the forest and stops playing music
             }
             
-            // Controls Menu Stuff
+            // Controls Menu Stuff (same as backgrounds basically)
             if (controlsMusicCanPlay == true)
             {
                 MediaPlayer.Play(controlsScreenMusic);
@@ -307,7 +309,7 @@ namespace shooter2playergame
                 menuMusicCanPlay = true;
                 redScore = 0;
                 blueScore = 0;
-                ResetPos(); // Basically resets everything and returns to main menu
+                ResetPos(); // resets everything and returns to main menu
             }
 
             if (gameHasStarted == true)
@@ -326,13 +328,13 @@ namespace shooter2playergame
                     // Red movement
                     if (redIsDodging == false)
                     {
-                        if (Keyboard.GetState().IsKeyDown(redguyMoveUp) && redguyPos.Y >= 5)
+                        if (Keyboard.GetState().IsKeyDown(redguyMoveUp) && redguyPos.Y >= 5) // I manually set bounds to where the players can and cannot go
                         {
                             redguyPos.Y -= redguySpeed;
                             if (gameTime.TotalGameTime.TotalMilliseconds > redTimeSinceLastWalked + walkSoundDelay)
                             {
                                 walkSound.Play(0.2f, 0, 0);
-                                redTimeSinceLastWalked = gameTime.TotalGameTime.TotalMilliseconds;
+                                redTimeSinceLastWalked = gameTime.TotalGameTime.TotalMilliseconds; // This only allows the walk sound to play every 400ms so that it doesn't become painful to listen to
                             }
                         }
                         if (Keyboard.GetState().IsKeyDown(redguyMoveDown) && redguyPos.Y <= 390)
@@ -366,7 +368,7 @@ namespace shooter2playergame
                         {
                             if (redfireDelay == false)
                             {
-                                bullets.Add(new Bullet(bulletSprite, redguyPos + new Vector2(50, 40), new Vector2(7, 0)));
+                                bullets.Add(new Bullet(bulletSprite, redguyPos + new Vector2(50, 40), new Vector2(7, 0))); // Adds a new bullet at redguy's position with the horizontal speed of +7
                                 pew.Play(0.2f,0,0);
                                 redfireDelay = true;
                             }
@@ -523,15 +525,17 @@ namespace shooter2playergame
                 if (redguyRect.Intersects(bullets[i].bulletRect)) {
                     if (gameTime.TotalGameTime.TotalMilliseconds > redInvulnTimer + redInvulnTime)
                     {
-                        bullets.Clear();
-                        blueScore = blueScore + 1;
-                        deathSound.Play(0.5f,0,0);
-                        blueHasScored = true;
-                        blueTimeSinceLastScore = gameTime.TotalGameTime.TotalMilliseconds;
+                        bullets.Clear(); // Clears all bullets on screen
+                        timeSinceLastSpawnRED = gameTime.TotalGameTime.TotalMilliseconds;
+                        timeSinceLastSpawnBLUE = gameTime.TotalGameTime.TotalMilliseconds; // Sets powerup time spawned to the current time to stop them from spawning
+                        powerups.Clear(); // Clears all powerups on screen
+                        blueScore = blueScore + 1; // adds 1 to blue's score
+                        deathSound.Play(0.5f,0,0); // plays a death sound
+                        blueHasScored = true; // sets bluehasscored to true, so that it can display the 'Blue scored!' text
+                        blueTimeSinceLastScore = gameTime.TotalGameTime.TotalMilliseconds; // sets blue time since last score to the current time, used for the amount of time 'Blue scored!' is on screen
                     }
                 }
             }
-
             //Blueguy gets hit
             for (int i = 0; i < bullets.Count; i++)
             {
@@ -540,6 +544,9 @@ namespace shooter2playergame
                     if (gameTime.TotalGameTime.TotalMilliseconds > blueInvulnTimer + blueInvulnTime)
                     {
                         bullets.Clear();
+                        timeSinceLastSpawnRED = gameTime.TotalGameTime.TotalMilliseconds;
+                        timeSinceLastSpawnBLUE = gameTime.TotalGameTime.TotalMilliseconds;
+                        powerups.Clear();
                         redScore = redScore + 1;
                         deathSound.Play(0.5f, 0, 0);
                         redHasScored = true;
@@ -547,19 +554,66 @@ namespace shooter2playergame
                     }
                 }
             }
+            // Bullet & Player interactions end
 
-            // WORK ON THIS
-            // Powerup stuff
+            // Powerup spawning
             if (gameHasStarted == false)
             {
-                timeSinceLastSpawnRED = 0;
-                timeSinceLastSpawnBLUE = 0;
+                timeSinceLastSpawnRED = gameTime.TotalGameTime.TotalMilliseconds;
+                timeSinceLastSpawnBLUE = gameTime.TotalGameTime.TotalMilliseconds; // stops powerups from spawning before the game starts
             }
 
             if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastSpawnRED + REDspawnDelay)
             {
-                powerups.Add(new DashPowerup(powerupSprite, new Vector2(randomPositionREDX, randomPositionREDY)));
-                Debug.WriteLine("powerup spawned");
+                powerups.Add(new DashPowerup(powerupSprite, new Vector2(randomPositionREDX, randomPositionREDY))); // spawns a powerup at a random position on Redguy's side
+                randomPositionREDX = new Random().Next(220, 380);
+                randomPositionREDY = new Random().Next(30, 460); // makes a new random position
+                REDspawnDelay = new Random().Next(15000, 25000); // sets the next powerup to spawn in 15 to 25 seconds
+                timeSinceLastSpawnRED = gameTime.TotalGameTime.TotalMilliseconds;
+            }
+            if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastSpawnBLUE + BLUEspawnDelay)
+            {
+                powerups.Add(new DashPowerup(powerupSprite, new Vector2(randomPositionBLUEX, randomPositionBLUEY)));
+                randomPositionBLUEX = new Random().Next(440, 560);
+                randomPositionBLUEY = new Random().Next(30, 460);
+                BLUEspawnDelay = new Random().Next(20000, 25000);
+                timeSinceLastSpawnBLUE = gameTime.TotalGameTime.TotalMilliseconds;
+            }
+
+            // Powerup & Player interactions
+            // Redguy picks up powerup
+            for (int i = 0; i < powerups.Count; i++)
+            {
+                if (redguyRect.Intersects(powerups[i].powerupRect))
+                {
+                    powerups.RemoveAt(i);
+                    redguySpeed = 5;
+                    redDodgeDelay = 600;
+                    REDpowerupTimer = gameTime.TotalGameTime.TotalMilliseconds;
+                }
+            }
+            // Blueguy picks up powerup
+            for (int i = 0; i < powerups.Count; i++)
+            {
+                if (blueguyRect.Intersects(powerups[i].powerupRect))
+                {
+                    powerups.RemoveAt(i);
+                    blueguySpeed = 5;
+                    blueDodgeDelay = 600;
+                    BLUEpowerupTimer = gameTime.TotalGameTime.TotalMilliseconds;
+                }
+            }
+
+            // Powerup timer
+            if (gameTime.TotalGameTime.TotalMilliseconds > REDpowerupTimer + powerupTime)
+            {
+                redguySpeed = 3;
+                redDodgeDelay = 1200;
+            }
+            if (gameTime.TotalGameTime.TotalMilliseconds > BLUEpowerupTimer + powerupTime)
+            {
+                blueguySpeed = 3;
+                blueDodgeDelay = 1200;
             }
 
             base.Update(gameTime);
@@ -665,9 +719,14 @@ namespace shooter2playergame
                 _spriteBatch.Draw(MainMenuSprite, new Vector2(0, 0), Color.White);
             }
 
+            // Drawing bullets and powerups
             for (int i = 0; i < bullets.Count; i++)
             {
                 bullets[i].Draw(_spriteBatch);
+            }
+            for (int i = 0; i < powerups.Count; i++)
+            {
+                powerups[i].Draw(_spriteBatch);
             }
 
             // Drawing controls menu

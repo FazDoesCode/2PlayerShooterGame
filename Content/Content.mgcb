@@ -111,7 +111,7 @@
 /processorParam:TextureFormat=Color
 /build:Items/crate.png
 
-#begin Items/speedpill.png
+#begin Items/Fastshoe.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -121,7 +121,7 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Items/speedpill.png
+/build:Items/Fastshoe.png
 
 #begin music/controlsscreenmusic.mp3
 /importer:Mp3Importer

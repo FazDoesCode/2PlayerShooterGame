@@ -10,21 +10,20 @@ namespace shooter2playergame
     {
         Vector2 position;
 
-        Texture2D powerupTexture;
+        Texture2D powerupSprite;
 
         public Rectangle powerupRect;
 
-        public DashPowerup(Texture2D powerupTexture, Vector2 position)
+        public DashPowerup(Texture2D powerupSprite, Vector2 position)
         {
             this.position = position;
-            this.powerupTexture = powerupTexture;
+            this.powerupSprite = powerupSprite;
         }
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            powerupRect = new Rectangle((int)position.X, (int)position.Y, (int)(powerupTexture.Width * 0.5f), (int)(powerupTexture.Height * 0.5f));
-            spriteBatch.Draw(powerupTexture, powerupRect, Color.White);
-
+            powerupRect = new Rectangle((int)position.X, (int)position.Y, (int)(powerupSprite.Width * 2f), (int)(powerupSprite.Height * 2f));
+            spriteBatch.Draw(powerupSprite, powerupRect, Color.White);
         }
     }
 }
