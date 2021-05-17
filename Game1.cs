@@ -28,6 +28,7 @@ namespace shooter2playergame
         Texture2D backgroundSprite2;
         Texture2D controlsScreen;
         Texture2D powerupSprite;
+        Texture2D smileySprite;
 
         // Declaring fonts
         SpriteFont font;
@@ -47,7 +48,8 @@ namespace shooter2playergame
         Vector2 blueguyPos = new Vector2(600, 175); // Sets redguy and blueguy's default position
         double redTimeSinceLastWalked = 0;
         double blueTimeSinceLastWalked = 0;
-        int walkSoundDelay = 400; // These are used to make walk sounds better
+        int redWalkSoundDelay = 400; // These are used to make walk sounds better
+        int blueWalkSoundDelay = 400; // They are kept seperate so they can speed up if the speed powerup is picked up
 
         // Dodging stuff
         int redDodgeDelay = 1200; // Red has 1.2 seconds of time between dodges, same as blue
@@ -96,14 +98,12 @@ namespace shooter2playergame
         // Powerup Stuff
         double timeSinceLastSpawnRED = 0;
         double timeSinceLastSpawnBLUE = 0; // Used as timers
-
         int REDspawnDelay = new Random().Next(7000, 15000);
-        int BLUEspawnDelay = new Random().Next(7000, 15000); // These set a random number between 7 second and 15 seconds, used to spawn the powerups
-        int randomPositionREDX = new Random().Next(220, 380);
+        int BLUEspawnDelay = new Random().Next(7000, 15000); // These set a random number between 7 second and 15 seconds, used to spawn the powerups when the game starts
+        int randomPositionREDX = new Random().Next(220, 340);
         int randomPositionREDY = new Random().Next(30, 460);
-        int randomPositionBLUEX = new Random().Next(440, 560);
-        int randomPositionBLUEY = new Random().Next(30, 460); // These are used to set a random spawn location
-
+        int randomPositionBLUEX = new Random().Next(420, 540);
+        int randomPositionBLUEY = new Random().Next(30, 460); // These are used to set a random spawn location for the powerups, on red and blue's side respectivley
         double REDpowerupTimer = 0;
         double BLUEpowerupTimer = 0;
         int powerupTime = 5000; // The powerups are active for 5 seconds
@@ -114,7 +114,7 @@ namespace shooter2playergame
         bool isInJapan = false;
         bool japanMusicCanPlay = false;
 
-        // Listing bullets & powerups
+        // Listing stuff
         List<Bullet> bullets = new List<Bullet>();
         List<DashPowerup> powerups = new List<DashPowerup>(); // Using lists so there can be multiple on screen
 
@@ -169,6 +169,7 @@ namespace shooter2playergame
             // Loading miscellaneous sprites
             bulletSprite = Content.Load<Texture2D>("Items/Bullet");
             powerupSprite = Content.Load<Texture2D>("Items/Fastshoe");
+            smileySprite = Content.Load<Texture2D>("Enemies/Smiley");
 
             // Loading menu sprites
             MainMenuSprite = Content.Load<Texture2D>("Backgrounds/MainMenu");
@@ -300,6 +301,7 @@ namespace shooter2playergame
             {
                 MediaPlayer.Stop();
                 bullets.Clear();
+                powerups.Clear();
                 isInMainMenu = true;
                 isInDesert = false;
                 isInForest = false;
@@ -331,7 +333,7 @@ namespace shooter2playergame
                         if (Keyboard.GetState().IsKeyDown(redguyMoveUp) && redguyPos.Y >= 5) // I manually set bounds to where the players can and cannot go
                         {
                             redguyPos.Y -= redguySpeed;
-                            if (gameTime.TotalGameTime.TotalMilliseconds > redTimeSinceLastWalked + walkSoundDelay)
+                            if (gameTime.TotalGameTime.TotalMilliseconds > redTimeSinceLastWalked + redWalkSoundDelay)
                             {
                                 walkSound.Play(0.2f, 0, 0);
                                 redTimeSinceLastWalked = gameTime.TotalGameTime.TotalMilliseconds; // This only allows the walk sound to play every 400ms so that it doesn't become painful to listen to
@@ -340,7 +342,7 @@ namespace shooter2playergame
                         if (Keyboard.GetState().IsKeyDown(redguyMoveDown) && redguyPos.Y <= 390)
                         {
                             redguyPos.Y += redguySpeed;
-                            if (gameTime.TotalGameTime.TotalMilliseconds > redTimeSinceLastWalked + walkSoundDelay)
+                            if (gameTime.TotalGameTime.TotalMilliseconds > redTimeSinceLastWalked + redWalkSoundDelay)
                             {
                                 walkSound.Play(0.2f, 0, 0);
                                 redTimeSinceLastWalked = gameTime.TotalGameTime.TotalMilliseconds;
@@ -349,7 +351,7 @@ namespace shooter2playergame
                         if (Keyboard.GetState().IsKeyDown(redguyMoveLeft) && redguyPos.X >= 1)
                         {
                             redguyPos.X -= redguySpeed;
-                            if (gameTime.TotalGameTime.TotalMilliseconds > redTimeSinceLastWalked + walkSoundDelay)
+                            if (gameTime.TotalGameTime.TotalMilliseconds > redTimeSinceLastWalked + redWalkSoundDelay)
                             {
                                 walkSound.Play(0.2f, 0, 0);
                                 redTimeSinceLastWalked = gameTime.TotalGameTime.TotalMilliseconds;
@@ -358,7 +360,7 @@ namespace shooter2playergame
                         if (Keyboard.GetState().IsKeyDown(redguyMoveRight) && redguyPos.X <= 340)
                         {
                             redguyPos.X += redguySpeed;
-                            if (gameTime.TotalGameTime.TotalMilliseconds > redTimeSinceLastWalked + walkSoundDelay)
+                            if (gameTime.TotalGameTime.TotalMilliseconds > redTimeSinceLastWalked + redWalkSoundDelay)
                             {
                                 walkSound.Play(0.2f, 0, 0);
                                 redTimeSinceLastWalked = gameTime.TotalGameTime.TotalMilliseconds;
@@ -426,7 +428,7 @@ namespace shooter2playergame
                         if (Keyboard.GetState().IsKeyDown(blueguyMoveUp) && blueguyPos.Y >= 5)
                         {
                             blueguyPos.Y -= blueguySpeed;
-                            if (gameTime.TotalGameTime.TotalMilliseconds > blueTimeSinceLastWalked + walkSoundDelay)
+                            if (gameTime.TotalGameTime.TotalMilliseconds > blueTimeSinceLastWalked + blueWalkSoundDelay)
                             {
                                 walkSound.Play(0.2f, 0, 0);
                                 blueTimeSinceLastWalked = gameTime.TotalGameTime.TotalMilliseconds;
@@ -435,7 +437,7 @@ namespace shooter2playergame
                         if (Keyboard.GetState().IsKeyDown(blueguyMoveDown) && blueguyPos.Y <= 390)
                         {
                             blueguyPos.Y += blueguySpeed;
-                            if (gameTime.TotalGameTime.TotalMilliseconds > blueTimeSinceLastWalked + walkSoundDelay)
+                            if (gameTime.TotalGameTime.TotalMilliseconds > blueTimeSinceLastWalked + blueWalkSoundDelay)
                             {
                                 walkSound.Play(0.2f, 0, 0);
                                 blueTimeSinceLastWalked = gameTime.TotalGameTime.TotalMilliseconds;
@@ -444,7 +446,7 @@ namespace shooter2playergame
                         if (Keyboard.GetState().IsKeyDown(blueguyMoveLeft) && blueguyPos.X >= 395)
                         {
                             blueguyPos.X -= blueguySpeed;
-                            if (gameTime.TotalGameTime.TotalMilliseconds > blueTimeSinceLastWalked + walkSoundDelay)
+                            if (gameTime.TotalGameTime.TotalMilliseconds > blueTimeSinceLastWalked + blueWalkSoundDelay)
                             {
                                 walkSound.Play(0.2f, 0, 0);
                                 blueTimeSinceLastWalked = gameTime.TotalGameTime.TotalMilliseconds;
@@ -453,7 +455,7 @@ namespace shooter2playergame
                         if (Keyboard.GetState().IsKeyDown(blueguyMoveRight) && blueguyPos.X <= 753)
                         {
                             blueguyPos.X += blueguySpeed;
-                            if (gameTime.TotalGameTime.TotalMilliseconds > blueTimeSinceLastWalked + walkSoundDelay)
+                            if (gameTime.TotalGameTime.TotalMilliseconds > blueTimeSinceLastWalked + blueWalkSoundDelay)
                             {
                                 walkSound.Play(0.2f, 0, 0);
                                 blueTimeSinceLastWalked = gameTime.TotalGameTime.TotalMilliseconds;
@@ -532,6 +534,12 @@ namespace shooter2playergame
                         blueScore = blueScore + 1; // adds 1 to blue's score
                         deathSound.Play(0.5f,0,0); // plays a death sound
                         blueHasScored = true; // sets bluehasscored to true, so that it can display the 'Blue scored!' text
+                        redguySpeed = 3;
+                        redDodgeDelay = 1200;
+                        redWalkSoundDelay = 400;
+                        blueguySpeed = 3;
+                        blueDodgeDelay = 1200;
+                        blueWalkSoundDelay = 400; // Resets speed and sounds in case someone still had the powerup right before they died
                         blueTimeSinceLastScore = gameTime.TotalGameTime.TotalMilliseconds; // sets blue time since last score to the current time, used for the amount of time 'Blue scored!' is on screen
                     }
                 }
@@ -550,6 +558,12 @@ namespace shooter2playergame
                         redScore = redScore + 1;
                         deathSound.Play(0.5f, 0, 0);
                         redHasScored = true;
+                        redguySpeed = 3;
+                        redDodgeDelay = 1200;
+                        redWalkSoundDelay = 400;
+                        blueguySpeed = 3;
+                        blueDodgeDelay = 1200;
+                        blueWalkSoundDelay = 400;
                         redTimeSinceLastScore = gameTime.TotalGameTime.TotalMilliseconds;
                     }
                 }
@@ -589,6 +603,7 @@ namespace shooter2playergame
                     powerups.RemoveAt(i);
                     redguySpeed = 5;
                     redDodgeDelay = 600;
+                    redWalkSoundDelay = 200;
                     REDpowerupTimer = gameTime.TotalGameTime.TotalMilliseconds;
                 }
             }
@@ -600,6 +615,7 @@ namespace shooter2playergame
                     powerups.RemoveAt(i);
                     blueguySpeed = 5;
                     blueDodgeDelay = 600;
+                    blueWalkSoundDelay = 200;
                     BLUEpowerupTimer = gameTime.TotalGameTime.TotalMilliseconds;
                 }
             }
@@ -609,11 +625,13 @@ namespace shooter2playergame
             {
                 redguySpeed = 3;
                 redDodgeDelay = 1200;
+                redWalkSoundDelay = 400;
             }
             if (gameTime.TotalGameTime.TotalMilliseconds > BLUEpowerupTimer + powerupTime)
             {
                 blueguySpeed = 3;
                 blueDodgeDelay = 1200;
+                blueWalkSoundDelay = 400;
             }
 
             base.Update(gameTime);
@@ -719,7 +737,7 @@ namespace shooter2playergame
                 _spriteBatch.Draw(MainMenuSprite, new Vector2(0, 0), Color.White);
             }
 
-            // Drawing bullets and powerups
+            // Drawing items (bullets, powerups)
             for (int i = 0; i < bullets.Count; i++)
             {
                 bullets[i].Draw(_spriteBatch);
