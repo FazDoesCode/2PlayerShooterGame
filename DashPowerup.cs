@@ -13,6 +13,7 @@ namespace shooter2playergame
         Texture2D powerupSprite;
 
         public Rectangle powerupRect;
+        float scale = 2f;
 
         public DashPowerup(Texture2D powerupSprite, Vector2 position)
         {
@@ -22,7 +23,7 @@ namespace shooter2playergame
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            powerupRect = new Rectangle((int)position.X, (int)position.Y, (int)(powerupSprite.Width * 2f), (int)(powerupSprite.Height * 2f));
+            powerupRect = new Rectangle((int)position.X, (int)position.Y, (int)(powerupSprite.Width * scale), (int)(powerupSprite.Height * scale));
             spriteBatch.Draw(powerupSprite, powerupRect, Color.White);
         }
     }

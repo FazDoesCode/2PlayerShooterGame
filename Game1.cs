@@ -29,6 +29,16 @@ namespace shooter2playergame
         Texture2D controlsScreen;
         Texture2D powerupSprite;
         Texture2D smileySprite;
+        Texture2D dojoBackground;
+        Texture2D finalBoss;
+        Texture2D Yellowguy;
+        Texture2D YellowguyARMS;
+        Texture2D blueguyCOOP;
+        Texture2D redguyCOOP;
+        Texture2D blueguyDodgeCOOP;
+        Texture2D redguyDodgeCOOP;
+        Texture2D graveStone;
+        Texture2D yellowguyBG;
 
         // Declaring fonts
         SpriteFont font;
@@ -40,6 +50,8 @@ namespace shooter2playergame
         SoundEffect bang;
         SoundEffect woosh;
         SoundEffect deathSound;
+        SoundEffect popSound;
+        SoundEffect blingSound;
         Song menuMusic;
         Song controlsScreenMusic;
 
@@ -100,10 +112,9 @@ namespace shooter2playergame
         double timeSinceLastSpawnBLUE = 0; // Used as timers
         int REDspawnDelay = new Random().Next(7000, 15000);
         int BLUEspawnDelay = new Random().Next(7000, 15000); // These set a random number between 7 second and 15 seconds, used to spawn the powerups when the game starts
-        int randomPositionREDX = new Random().Next(220, 340);
-        int randomPositionREDY = new Random().Next(30, 460);
-        int randomPositionBLUEX = new Random().Next(420, 540);
-        int randomPositionBLUEY = new Random().Next(30, 460); // These are used to set a random spawn location for the powerups, on red and blue's side respectivley
+        int randomPositionREDX = new Random().Next(180, 320);
+        int randomPositionBLUEX = new Random().Next(430, 520); // These are used to set a random spawn location for the powerups, on red and blue's side respectivley
+        int randomPositionY = new Random().Next(50, 300);
         double REDpowerupTimer = 0;
         double BLUEpowerupTimer = 0;
         int powerupTime = 5000; // The powerups are active for 5 seconds
@@ -113,6 +124,9 @@ namespace shooter2playergame
         Song japaneseMusic;
         bool isInJapan = false;
         bool japanMusicCanPlay = false;
+        bool overPlayJapButton = false;
+        bool overExitButton = false;
+        bool JapGameHasStarted = false;
 
         // Listing stuff
         List<Bullet> bullets = new List<Bullet>();
@@ -166,10 +180,21 @@ namespace shooter2playergame
             redguySpriteDead = Content.Load<Texture2D>("Players/Redguydead");
             blueguySpriteDead = Content.Load<Texture2D>("Players/Blueguydead");
 
+            redguyCOOP = Content.Load<Texture2D>("Players/RedguyCOOP");
+            blueguyCOOP = Content.Load<Texture2D>("Players/BlueguyCOOP");
+            blueguyDodgeCOOP = Content.Load<Texture2D>("Players/BlueguydodgelargeCOOP");
+            redguyCOOP = Content.Load<Texture2D>("Players/RedguydodgelargeCOOP");
+
             // Loading miscellaneous sprites
             bulletSprite = Content.Load<Texture2D>("Items/Bullet");
             powerupSprite = Content.Load<Texture2D>("Items/Fastshoe");
+            graveStone = Content.Load<Texture2D>("Players/Gravestone");
+
+            // Loading enemies
             smileySprite = Content.Load<Texture2D>("Enemies/Smiley");
+            finalBoss = Content.Load<Texture2D>("Enemies/finalboss1");
+            Yellowguy = Content.Load<Texture2D>("Enemies/Yellowguy");
+            YellowguyARMS = Content.Load<Texture2D>("Enemies/YellowguyARMS");
 
             // Loading menu sprites
             MainMenuSprite = Content.Load<Texture2D>("Backgrounds/MainMenu");
@@ -179,6 +204,8 @@ namespace shooter2playergame
             // Loading gameplay backgrounds
             backgroundSprite = Content.Load<Texture2D>("Backgrounds/Desertbackground");
             backgroundSprite2 = Content.Load<Texture2D>("Backgrounds/Forestbackground");
+            dojoBackground = Content.Load<Texture2D>("Backgrounds/dojo");
+            yellowguyBG = Content.Load<Texture2D>("Backgrounds/YellowguyBGBars");
 
             // Loading fonts
             font = Content.Load<SpriteFont>("Fonts/Font");
@@ -195,6 +222,8 @@ namespace shooter2playergame
             walkSound = Content.Load<SoundEffect>("sound effects/walksound");
             deathSound = Content.Load<SoundEffect>("sound effects/deathsound");
             woosh = Content.Load<SoundEffect>("sound effects/woosh");
+            popSound = Content.Load<SoundEffect>("sound effects/pop");
+            blingSound = Content.Load<SoundEffect>("sound effects/bling");
         }
 
         protected override void Update(GameTime gameTime)
@@ -280,22 +309,6 @@ namespace shooter2playergame
                 controlsMusicCanPlay = true;
             }
 
-            // Japanese mode stuff
-            if (Keyboard.GetState().IsKeyDown(Keys.A) && Keyboard.GetState().IsKeyDown(Keys.N) && Keyboard.GetState().IsKeyDown(Keys.I) && Keyboard.GetState().IsKeyDown(Keys.M) && Keyboard.GetState().IsKeyDown(Keys.E) && isInMainMenu == true)
-            {
-                isInMainMenu = false;
-                isInJapan = true;
-                MediaPlayer.Stop();
-                japanMusicCanPlay = true;
-            }
-            if (japanMusicCanPlay == true)
-            {
-                MediaPlayer.Play(japaneseMusic);
-                MediaPlayer.Volume = 0.4f;
-                MediaPlayer.IsRepeating = true;
-                japanMusicCanPlay = false;
-            }
-
             // Exiting the game / Returning to menu
             if (Keyboard.GetState().IsKeyDown(Keys.Escape) && gameHasStarted == true || Keyboard.GetState().IsKeyDown(Keys.Escape) && isInControlsMenu == true || Keyboard.GetState().IsKeyDown(Keys.Escape) && isInJapan == true)
             {
@@ -309,9 +322,19 @@ namespace shooter2playergame
                 isInJapan = false;
                 gameHasStarted = false;
                 menuMusicCanPlay = true;
+                redHasScored = false;
+                blueHasScored = false;
                 redScore = 0;
                 blueScore = 0;
-                ResetPos(); // resets everything and returns to main menu
+                ResetPos(); // on pressing escape it resets everything and returns to main menu
+            }
+            if (Keyboard.GetState().IsKeyDown(Keys.Escape) && JapGameHasStarted == true)
+            {
+                MediaPlayer.Stop();
+                isInJapan = true;
+                JapGameHasStarted = false;
+                bullets.Clear();
+                japanMusicCanPlay = true;
             }
 
             if (gameHasStarted == true)
@@ -335,7 +358,7 @@ namespace shooter2playergame
                             redguyPos.Y -= redguySpeed;
                             if (gameTime.TotalGameTime.TotalMilliseconds > redTimeSinceLastWalked + redWalkSoundDelay)
                             {
-                                walkSound.Play(0.2f, 0, 0);
+                                walkSound.Play(0.1f, 0, 0);
                                 redTimeSinceLastWalked = gameTime.TotalGameTime.TotalMilliseconds; // This only allows the walk sound to play every 400ms so that it doesn't become painful to listen to
                             }
                         }
@@ -344,7 +367,7 @@ namespace shooter2playergame
                             redguyPos.Y += redguySpeed;
                             if (gameTime.TotalGameTime.TotalMilliseconds > redTimeSinceLastWalked + redWalkSoundDelay)
                             {
-                                walkSound.Play(0.2f, 0, 0);
+                                walkSound.Play(0.1f, 0, 0);
                                 redTimeSinceLastWalked = gameTime.TotalGameTime.TotalMilliseconds;
                             }
                         }
@@ -353,7 +376,7 @@ namespace shooter2playergame
                             redguyPos.X -= redguySpeed;
                             if (gameTime.TotalGameTime.TotalMilliseconds > redTimeSinceLastWalked + redWalkSoundDelay)
                             {
-                                walkSound.Play(0.2f, 0, 0);
+                                walkSound.Play(0.1f, 0, 0);
                                 redTimeSinceLastWalked = gameTime.TotalGameTime.TotalMilliseconds;
                             }
                         }
@@ -362,7 +385,7 @@ namespace shooter2playergame
                             redguyPos.X += redguySpeed;
                             if (gameTime.TotalGameTime.TotalMilliseconds > redTimeSinceLastWalked + redWalkSoundDelay)
                             {
-                                walkSound.Play(0.2f, 0, 0);
+                                walkSound.Play(0.1f, 0, 0);
                                 redTimeSinceLastWalked = gameTime.TotalGameTime.TotalMilliseconds;
                             }
                         }
@@ -372,12 +395,12 @@ namespace shooter2playergame
                             {
                                 bullets.Add(new Bullet(bulletSprite, redguyPos + new Vector2(50, 40), new Vector2(7, 0))); // Adds a new bullet at redguy's position with the horizontal speed of +7
                                 pew.Play(0.2f,0,0);
-                                redfireDelay = true;
+                                redfireDelay = true; // Red cannot fire if the shoot button is held down
                             }
                         }
                         if (Keyboard.GetState().IsKeyUp(redguyShoot))
                         {
-                            redfireDelay = false;
+                            redfireDelay = false; // Red has to lift the shoot button to fire again
                         }
 
                         // Red dodging
@@ -385,44 +408,36 @@ namespace shooter2playergame
                         {
                             if (Keyboard.GetState().IsKeyDown(redguyDodge) && Keyboard.GetState().IsKeyDown(redguyMoveDown) && redguyPos.Y <= 346)
                             {
-                                redIsDodging = true;
-                                woosh.Play(0.3f, 0, 0);
-                                redguyPos.Y += dodgeDistance;
-                                redtimeSinceLastDodge = gameTime.TotalGameTime.TotalMilliseconds;
-                                redInvulnTimer = gameTime.TotalGameTime.TotalMilliseconds;
-                                redIsDodging = false;
+                                redtimeSinceLastDodge = gameTime.TotalGameTime.TotalMilliseconds; // Set the time since his last dodge to the current time
+                                redInvulnTimer = gameTime.TotalGameTime.TotalMilliseconds; // Set his invulnerability timer to the current time
+                                redguyPos.Y += dodgeDistance; // Change redguy's Y position by the dodge distance (Y position because he's moving down)
+                                RedDodge();
                             }
                             if (Keyboard.GetState().IsKeyDown(redguyDodge) && Keyboard.GetState().IsKeyDown(redguyMoveUp) && redguyPos.Y >= 42)
                             {
-                                redIsDodging = true;
-                                woosh.Play(0.3f, 0, 0);
-                                redguyPos.Y -= dodgeDistance;
                                 redtimeSinceLastDodge = gameTime.TotalGameTime.TotalMilliseconds;
                                 redInvulnTimer = gameTime.TotalGameTime.TotalMilliseconds;
-                                redIsDodging = false;
+                                redguyPos.Y -= dodgeDistance;
+                                RedDodge();
                             }
                             if (Keyboard.GetState().IsKeyDown(redguyDodge) && Keyboard.GetState().IsKeyDown(redguyMoveRight) && redguyPos.X <= 246)
                             {
-                                redIsDodging = true;
-                                woosh.Play(0.3f, 0, 0);
-                                redguyPos.X += dodgeDistance;
                                 redtimeSinceLastDodge = gameTime.TotalGameTime.TotalMilliseconds;
                                 redInvulnTimer = gameTime.TotalGameTime.TotalMilliseconds;
-                                redIsDodging = false;
+                                redguyPos.X += dodgeDistance;
+                                RedDodge();
                             }
                             if (Keyboard.GetState().IsKeyDown(redguyDodge) && Keyboard.GetState().IsKeyDown(redguyMoveLeft) && redguyPos.X >= 70)
                             {
-                                redIsDodging = true;
-                                woosh.Play(0.3f, 0, 0);
-                                redguyPos.X -= dodgeDistance;
                                 redtimeSinceLastDodge = gameTime.TotalGameTime.TotalMilliseconds;
                                 redInvulnTimer = gameTime.TotalGameTime.TotalMilliseconds;
-                                redIsDodging = false;
+                                redguyPos.X -= dodgeDistance;                               
+                                RedDodge();
                             }
                         }
                     }
 
-                    // Blue movement
+                    // Blue movement (basically the same as red)
                     if (blueIsDodging == false)
                     {
                         if (Keyboard.GetState().IsKeyDown(blueguyMoveUp) && blueguyPos.Y >= 5)
@@ -430,7 +445,7 @@ namespace shooter2playergame
                             blueguyPos.Y -= blueguySpeed;
                             if (gameTime.TotalGameTime.TotalMilliseconds > blueTimeSinceLastWalked + blueWalkSoundDelay)
                             {
-                                walkSound.Play(0.2f, 0, 0);
+                                walkSound.Play(0.1f, 0, 0);
                                 blueTimeSinceLastWalked = gameTime.TotalGameTime.TotalMilliseconds;
                             }
                         }
@@ -439,7 +454,7 @@ namespace shooter2playergame
                             blueguyPos.Y += blueguySpeed;
                             if (gameTime.TotalGameTime.TotalMilliseconds > blueTimeSinceLastWalked + blueWalkSoundDelay)
                             {
-                                walkSound.Play(0.2f, 0, 0);
+                                walkSound.Play(0.1f, 0, 0);
                                 blueTimeSinceLastWalked = gameTime.TotalGameTime.TotalMilliseconds;
                             }
                         }
@@ -448,7 +463,7 @@ namespace shooter2playergame
                             blueguyPos.X -= blueguySpeed;
                             if (gameTime.TotalGameTime.TotalMilliseconds > blueTimeSinceLastWalked + blueWalkSoundDelay)
                             {
-                                walkSound.Play(0.2f, 0, 0);
+                                walkSound.Play(0.1f, 0, 0);
                                 blueTimeSinceLastWalked = gameTime.TotalGameTime.TotalMilliseconds;
                             }
                         }
@@ -457,7 +472,7 @@ namespace shooter2playergame
                             blueguyPos.X += blueguySpeed;
                             if (gameTime.TotalGameTime.TotalMilliseconds > blueTimeSinceLastWalked + blueWalkSoundDelay)
                             {
-                                walkSound.Play(0.2f, 0, 0);
+                                walkSound.Play(0.1f, 0, 0);
                                 blueTimeSinceLastWalked = gameTime.TotalGameTime.TotalMilliseconds;
                             }
                         }
@@ -480,39 +495,31 @@ namespace shooter2playergame
                         {
                             if (Keyboard.GetState().IsKeyDown(blueguyDodge) && Keyboard.GetState().IsKeyDown(blueguyMoveDown) && blueguyPos.Y <= 346)
                             {
-                                blueIsDodging = true;
-                                blueguyPos.Y += dodgeDistance;
-                                woosh.Play(0.3f,0,0);
                                 bluetimeSinceLastDodge = gameTime.TotalGameTime.TotalMilliseconds;
                                 blueInvulnTimer = gameTime.TotalGameTime.TotalMilliseconds;
-                                blueIsDodging = false;
+                                blueguyPos.Y += dodgeDistance;
+                                BlueDodge();
                             }
                             if (Keyboard.GetState().IsKeyDown(blueguyDodge) && Keyboard.GetState().IsKeyDown(blueguyMoveUp) && blueguyPos.Y >= 42)
                             {
-                                blueIsDodging = true;
-                                woosh.Play(0.3f, 0, 0);
-                                blueguyPos.Y -= dodgeDistance;
                                 bluetimeSinceLastDodge = gameTime.TotalGameTime.TotalMilliseconds;
                                 blueInvulnTimer = gameTime.TotalGameTime.TotalMilliseconds;
-                                blueIsDodging = false;
+                                blueguyPos.Y -= dodgeDistance;
+                                BlueDodge();
                             }
                             if (Keyboard.GetState().IsKeyDown(blueguyDodge) && Keyboard.GetState().IsKeyDown(blueguyMoveRight) && blueguyPos.X <= 684)
                             {
-                                blueIsDodging = true;
-                                woosh.Play(0.3f, 0, 0);
-                                blueguyPos.X += dodgeDistance;
                                 bluetimeSinceLastDodge = gameTime.TotalGameTime.TotalMilliseconds;
                                 blueInvulnTimer = gameTime.TotalGameTime.TotalMilliseconds;
-                                blueIsDodging = false;
+                                blueguyPos.X += dodgeDistance;
+                                BlueDodge();
                             }
                             if (Keyboard.GetState().IsKeyDown(blueguyDodge) && Keyboard.GetState().IsKeyDown(blueguyMoveLeft) && blueguyPos.X >= 450)
                             {
-                                blueIsDodging = true;
-                                woosh.Play(0.3f, 0, 0);
-                                blueguyPos.X -= dodgeDistance;
                                 bluetimeSinceLastDodge = gameTime.TotalGameTime.TotalMilliseconds;
                                 blueInvulnTimer = gameTime.TotalGameTime.TotalMilliseconds;
-                                blueIsDodging = false;
+                                blueguyPos.X -= dodgeDistance;
+                                BlueDodge();
                             }
                         }
                     }
@@ -521,50 +528,54 @@ namespace shooter2playergame
             // Red and Blue movement end
 
             //Bullet & Player interactions
-            //Redguy gets hit
-            for (int i = 0; i < bullets.Count; i++)
+            if (gameHasStarted == true)
             {
-                if (redguyRect.Intersects(bullets[i].bulletRect)) {
-                    if (gameTime.TotalGameTime.TotalMilliseconds > redInvulnTimer + redInvulnTime)
+                //Redguy gets hit
+                for (int i = 0; i < bullets.Count; i++)
+                {
+                    if (redguyRect.Intersects(bullets[i].bulletRect))
                     {
-                        bullets.Clear(); // Clears all bullets on screen
-                        timeSinceLastSpawnRED = gameTime.TotalGameTime.TotalMilliseconds;
-                        timeSinceLastSpawnBLUE = gameTime.TotalGameTime.TotalMilliseconds; // Sets powerup time spawned to the current time to stop them from spawning
-                        powerups.Clear(); // Clears all powerups on screen
-                        blueScore = blueScore + 1; // adds 1 to blue's score
-                        deathSound.Play(0.5f,0,0); // plays a death sound
-                        blueHasScored = true; // sets bluehasscored to true, so that it can display the 'Blue scored!' text
-                        redguySpeed = 3;
-                        redDodgeDelay = 1200;
-                        redWalkSoundDelay = 400;
-                        blueguySpeed = 3;
-                        blueDodgeDelay = 1200;
-                        blueWalkSoundDelay = 400; // Resets speed and sounds in case someone still had the powerup right before they died
-                        blueTimeSinceLastScore = gameTime.TotalGameTime.TotalMilliseconds; // sets blue time since last score to the current time, used for the amount of time 'Blue scored!' is on screen
+                        if (gameTime.TotalGameTime.TotalMilliseconds > redInvulnTimer + redInvulnTime)
+                        {
+                            bullets.Clear(); // Clears all bullets on screen
+                            timeSinceLastSpawnRED = gameTime.TotalGameTime.TotalMilliseconds;
+                            timeSinceLastSpawnBLUE = gameTime.TotalGameTime.TotalMilliseconds; // Sets powerup time spawned to the current time to stop them from spawning
+                            powerups.Clear(); // Clears all powerups on screen
+                            blueScore = blueScore + 1; // adds 1 to blue's score
+                            deathSound.Play(0.5f, 0, 0); // plays a death sound
+                            blueHasScored = true; // sets bluehasscored to true, so that it can display the 'Blue scored!' text
+                            redguySpeed = 3;
+                            redDodgeDelay = 1200;
+                            redWalkSoundDelay = 400;
+                            blueguySpeed = 3;
+                            blueDodgeDelay = 1200;
+                            blueWalkSoundDelay = 400; // Resets speed and sounds in case someone still had the powerup right before they died
+                            blueTimeSinceLastScore = gameTime.TotalGameTime.TotalMilliseconds; // sets blue time since last score to the current time, used for the amount of time 'Blue scored!' is on screen
+                        }
                     }
                 }
-            }
-            //Blueguy gets hit
-            for (int i = 0; i < bullets.Count; i++)
-            {
-                if (blueguyRect.Intersects(bullets[i].bulletRect))
+                //Blueguy gets hit (same as red, except red scores)
+                for (int i = 0; i < bullets.Count; i++)
                 {
-                    if (gameTime.TotalGameTime.TotalMilliseconds > blueInvulnTimer + blueInvulnTime)
+                    if (blueguyRect.Intersects(bullets[i].bulletRect))
                     {
-                        bullets.Clear();
-                        timeSinceLastSpawnRED = gameTime.TotalGameTime.TotalMilliseconds;
-                        timeSinceLastSpawnBLUE = gameTime.TotalGameTime.TotalMilliseconds;
-                        powerups.Clear();
-                        redScore = redScore + 1;
-                        deathSound.Play(0.5f, 0, 0);
-                        redHasScored = true;
-                        redguySpeed = 3;
-                        redDodgeDelay = 1200;
-                        redWalkSoundDelay = 400;
-                        blueguySpeed = 3;
-                        blueDodgeDelay = 1200;
-                        blueWalkSoundDelay = 400;
-                        redTimeSinceLastScore = gameTime.TotalGameTime.TotalMilliseconds;
+                        if (gameTime.TotalGameTime.TotalMilliseconds > blueInvulnTimer + blueInvulnTime)
+                        {
+                            bullets.Clear();
+                            timeSinceLastSpawnRED = gameTime.TotalGameTime.TotalMilliseconds;
+                            timeSinceLastSpawnBLUE = gameTime.TotalGameTime.TotalMilliseconds;
+                            powerups.Clear();
+                            redScore = redScore + 1;
+                            deathSound.Play(0.5f, 0, 0);
+                            redHasScored = true;
+                            redguySpeed = 3;
+                            redDodgeDelay = 1200;
+                            redWalkSoundDelay = 400;
+                            blueguySpeed = 3;
+                            blueDodgeDelay = 1200;
+                            blueWalkSoundDelay = 400;
+                            redTimeSinceLastScore = gameTime.TotalGameTime.TotalMilliseconds;
+                        }
                     }
                 }
             }
@@ -579,18 +590,20 @@ namespace shooter2playergame
 
             if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastSpawnRED + REDspawnDelay)
             {
-                powerups.Add(new DashPowerup(powerupSprite, new Vector2(randomPositionREDX, randomPositionREDY))); // spawns a powerup at a random position on Redguy's side
-                randomPositionREDX = new Random().Next(220, 380);
-                randomPositionREDY = new Random().Next(30, 460); // makes a new random position
-                REDspawnDelay = new Random().Next(15000, 25000); // sets the next powerup to spawn in 15 to 25 seconds
+                powerups.Add(new DashPowerup(powerupSprite, new Vector2(randomPositionREDX, randomPositionY))); // spawns a powerup at a random position on Redguy's side
+                popSound.Play(0.6f, 0, 0); // Plays a popping sound effect
+                randomPositionREDX = new Random().Next(180, 320);
+                randomPositionY = new Random().Next(50, 300); // makes a new random position
+                REDspawnDelay = new Random().Next(17000, 22000); // sets the next powerup to spawn in 17 to 22 seconds
                 timeSinceLastSpawnRED = gameTime.TotalGameTime.TotalMilliseconds;
             }
             if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastSpawnBLUE + BLUEspawnDelay)
             {
-                powerups.Add(new DashPowerup(powerupSprite, new Vector2(randomPositionBLUEX, randomPositionBLUEY)));
-                randomPositionBLUEX = new Random().Next(440, 560);
-                randomPositionBLUEY = new Random().Next(30, 460);
-                BLUEspawnDelay = new Random().Next(20000, 25000);
+                powerups.Add(new DashPowerup(powerupSprite, new Vector2(randomPositionBLUEX, randomPositionY)));
+                popSound.Play(0.6f, 0, 0);
+                randomPositionBLUEX = new Random().Next(430, 520);
+                randomPositionY = new Random().Next(50, 300);
+                BLUEspawnDelay = new Random().Next(17000, 22000);
                 timeSinceLastSpawnBLUE = gameTime.TotalGameTime.TotalMilliseconds;
             }
 
@@ -600,11 +613,12 @@ namespace shooter2playergame
             {
                 if (redguyRect.Intersects(powerups[i].powerupRect))
                 {
-                    powerups.RemoveAt(i);
-                    redguySpeed = 5;
-                    redDodgeDelay = 600;
-                    redWalkSoundDelay = 200;
-                    REDpowerupTimer = gameTime.TotalGameTime.TotalMilliseconds;
+                    powerups.RemoveAt(i); // Removes the picked up powerup
+                    blingSound.Play(0.6f, 0, 0); // Plays a bling sound
+                    redguySpeed = 5; // Makes redguy faster
+                    redDodgeDelay = 850; // Makes his dodge delay less, allowing him to dodge faster
+                    redWalkSoundDelay = 200; // Halves the walk sound delay, so it plays more freqently
+                    REDpowerupTimer = gameTime.TotalGameTime.TotalMilliseconds; // Sets the timer to the current time
                 }
             }
             // Blueguy picks up powerup
@@ -613,8 +627,9 @@ namespace shooter2playergame
                 if (blueguyRect.Intersects(powerups[i].powerupRect))
                 {
                     powerups.RemoveAt(i);
+                    blingSound.Play(0.6f, 0, 0);
                     blueguySpeed = 5;
-                    blueDodgeDelay = 600;
+                    blueDodgeDelay = 850;
                     blueWalkSoundDelay = 200;
                     BLUEpowerupTimer = gameTime.TotalGameTime.TotalMilliseconds;
                 }
@@ -625,7 +640,7 @@ namespace shooter2playergame
             {
                 redguySpeed = 3;
                 redDodgeDelay = 1200;
-                redWalkSoundDelay = 400;
+                redWalkSoundDelay = 400; // Changes redguy's speed and dodge delay to default when the timer runs out
             }
             if (gameTime.TotalGameTime.TotalMilliseconds > BLUEpowerupTimer + powerupTime)
             {
@@ -634,15 +649,88 @@ namespace shooter2playergame
                 blueWalkSoundDelay = 400;
             }
 
+            // Japanese mode stuff
+            if (Keyboard.GetState().IsKeyDown(Keys.A) && Keyboard.GetState().IsKeyDown(Keys.N) && Keyboard.GetState().IsKeyDown(Keys.I) && Keyboard.GetState().IsKeyDown(Keys.M) && Keyboard.GetState().IsKeyDown(Keys.E) && isInMainMenu == true)
+            { // If you hold down 'ANIME' you go to the seceret japanese mode
+                isInMainMenu = false;
+                isInJapan = true;
+                MediaPlayer.Stop();
+                japanMusicCanPlay = true;
+            }
+            if (japanMusicCanPlay == true)
+            {
+                MediaPlayer.Play(japaneseMusic);
+                MediaPlayer.Volume = 0.4f;
+                MediaPlayer.IsRepeating = true;
+                japanMusicCanPlay = false;
+            }
+            if (isInJapan == true)
+            {
+                if (mouseState.X > 80 && mouseState.X < 325 && mouseState.Y < 235 && mouseState.Y > 115)
+                {
+                    overPlayJapButton = true;
+                }
+                else
+                {
+                    overPlayJapButton = false;
+                }
+                if (mouseState.X > 80 && mouseState.X < 325 && mouseState.Y < 390 && mouseState.Y > 270)
+                {
+                    overExitButton = true;
+                }
+                else
+                {
+                    overExitButton = false;
+                }
+                if (overExitButton == true && mouseState.LeftButton == ButtonState.Pressed)
+                {
+                    MediaPlayer.Stop();
+                    bullets.Clear();
+                    powerups.Clear();
+                    isInMainMenu = true;
+                    isInDesert = false;
+                    isInForest = false;
+                    isInControlsMenu = false;
+                    isInJapan = false;
+                    gameHasStarted = false;
+                    menuMusicCanPlay = true;
+                    redHasScored = false;
+                    blueHasScored = false;
+                    redScore = 0;
+                    blueScore = 0;
+                    ResetPos();
+                }
+                if (overPlayJapButton == true && mouseState.LeftButton == ButtonState.Pressed)
+                {
+                    MediaPlayer.Stop();
+                    isInJapan = false;
+                    JapGameHasStarted = true;
+                }
+            }
+
             base.Update(gameTime);
         }
 
-        void ResetPos()
+        void ResetPos() // Self explanitory
         {
             redguyPos.X = 100;
             redguyPos.Y = 175;
             blueguyPos.X = 600;
             blueguyPos.Y = 175;
+        }
+
+        void RedDodge()
+        {
+            redIsDodging = true; // Red is dodging
+            woosh.Play(0.3f, 0, 0); // play a whoosh sound effect
+            redIsDodging = false; // Red is no longer dodging
+            // I think redIsDodging / blueIsDodging is actually useless but I don't know if something will break if I remove it.
+        }
+        void BlueDodge()
+        {
+            blueIsDodging = true;
+            woosh.Play(0.3f, 0, 0);
+            blueIsDodging = false;
         }
 
         int scale = 3;
@@ -699,10 +787,7 @@ namespace shooter2playergame
                         _spriteBatch.Draw(blueguySpriteDodgeLarge, blueguyDodgeRect, Color.White);
                     }
                 }
-            }
 
-            if (gameHasStarted == true)
-            {
                 // Drawing Blueguy & Redguy scores
                 redScoreString = redScore.ToString();
                 _spriteBatch.DrawString(font, "Red Score: " + redScoreString, new Vector2(10, 10), Color.Black);
@@ -729,6 +814,12 @@ namespace shooter2playergame
                         ResetPos();
                     }
                 }
+
+                if (redScore > 14 && redScore < 18 || blueScore > 14 && blueScore < 18 || redScore + blueScore > 14 && redScore + blueScore < 18)
+                {
+                    _spriteBatch.DrawString(font, "You've been fighting for a while.", new Vector2(260, 440), Color.Black);
+                    _spriteBatch.DrawString(font, "In the menu, hold down the keys that spell ANIME for your final fight.", new Vector2(150, 460), Color.Black);
+                }
             }
 
             // Drawing main menu
@@ -738,13 +829,13 @@ namespace shooter2playergame
             }
 
             // Drawing items (bullets, powerups)
-            for (int i = 0; i < bullets.Count; i++)
-            {
-                bullets[i].Draw(_spriteBatch);
-            }
             for (int i = 0; i < powerups.Count; i++)
             {
                 powerups[i].Draw(_spriteBatch);
+            }
+            for (int i = 0; i < bullets.Count; i++)
+            {
+                bullets[i].Draw(_spriteBatch);
             }
 
             // Drawing controls menu
@@ -757,6 +848,10 @@ namespace shooter2playergame
             if (isInJapan == true)
             {
                 _spriteBatch.Draw(japaneseMenu, new Vector2(0, 0), Color.White);
+            }
+            if (JapGameHasStarted == true)
+            {
+                _spriteBatch.Draw(dojoBackground, new Vector2(0, 0), Color.White);
             }
 
             _spriteBatch.End();
