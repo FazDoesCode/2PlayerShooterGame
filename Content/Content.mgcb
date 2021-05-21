@@ -25,30 +25,6 @@
 /processorParam:TextureFormat=Color
 /build:Backgrounds/Controlsscreen.png
 
-#begin Backgrounds/Controlsscreen.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Backgrounds/Controlsscreen.png
-
-#begin Backgrounds/Desertbackground.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Backgrounds/Desertbackground.png
-
 #begin Backgrounds/Desertbackground.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -85,18 +61,6 @@
 /processorParam:TextureFormat=Color
 /build:Backgrounds/Forestbackground.png
 
-#begin Backgrounds/Forestbackground.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Backgrounds/Forestbackground.png
-
 #begin Backgrounds/Japanesemenu.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -108,30 +72,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Backgrounds/Japanesemenu.png
-
-#begin Backgrounds/Japanesemenu.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Backgrounds/Japanesemenu.png
-
-#begin Backgrounds/MainMenu.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Backgrounds/MainMenu.png
 
 #begin Backgrounds/MainMenu.png
 /importer:TextureImporter
@@ -168,18 +108,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Enemies/finalboss1.png
-
-#begin Enemies/Smiley.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Enemies/Smiley.png
 
 #begin Enemies/Smiley.png
 /importer:TextureImporter
@@ -261,12 +189,6 @@
 /processorParam:Quality=Best
 /build:music/controlsscreenmusic.mp3
 
-#begin music/controlsscreenmusic.mp3
-/importer:Mp3Importer
-/processor:SongProcessor
-/processorParam:Quality=Best
-/build:music/controlsscreenmusic.mp3
-
 #begin music/Finalbossspeech.mp3
 /importer:Mp3Importer
 /processor:SongProcessor
@@ -278,18 +200,6 @@
 /processor:SongProcessor
 /processorParam:Quality=Best
 /build:music/japanesemusic.mp3
-
-#begin music/japanesemusic.mp3
-/importer:Mp3Importer
-/processor:SongProcessor
-/processorParam:Quality=Best
-/build:music/japanesemusic.mp3
-
-#begin music/menumusic.mp3
-/importer:Mp3Importer
-/processor:SongProcessor
-/processorParam:Quality=Best
-/build:music/menumusic.mp3
 
 #begin music/menumusic.mp3
 /importer:Mp3Importer
@@ -381,18 +291,6 @@
 /processorParam:TextureFormat=Color
 /build:Players/Redguy.png
 
-#begin Players/RedguyCOOP.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Players/RedguyCOOP.png
-
 #begin Players/Redguydead.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -416,18 +314,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Players/Redguydodgelarge.png
-
-#begin Players/RedguydodgelargeCOOP.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Players/RedguydodgelargeCOOP.png
 
 #begin sound effects/bang.mp3
 /importer:Mp3Importer
