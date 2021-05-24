@@ -98,16 +98,16 @@ namespace shooter2playergame
         bool overControlsButton = false;
         bool overAltControlsButton = false;
         bool inAltControlsMenu = false;
-        bool overMap1Button = false; // Used for button selection
+        bool overMap1Button = false;
         bool overMap2Button = false; // Used for the button selection
-        bool menuMusicCanPlay = true; // self explanitory
+        bool menuMusicCanPlay = true; 
+        bool controlsMusicCanPlay = false; // self explanatory
         bool escapeKeyWasPressed = false; // Used to make escape presses a toggle
 
         // Background stuff
         bool isInDesert = false;
         bool isInForest = false;
         bool isInControlsMenu = false; // These are used to determine what background is displayed
-        bool controlsMusicCanPlay = false;
 
         // Scoring stuff
         int redScore = 0;
@@ -137,19 +137,20 @@ namespace shooter2playergame
         Texture2D japaneseMenu;
         Song japaneseMusic;
         bool isInJapan = false;
-        bool isInDojo = false;
-        bool japanMusicCanPlay = false;
-        bool overPlayJapButton = false;
-        bool overExitButton = false;
+        bool isInDojo = false; // Used for backgrounds
+        bool japanMusicCanPlay = false; // Used to play the music
+        bool overPlayJapButton = false; 
+        bool overExitButton = false; // Used for button management
         bool JapGameHasStarted = false;
         bool blueIsAliveCOOP = true;
         bool redIsAliveCOOP = true;
-        double cutsceneStartTime = 0;
-        int cutsceneLength = 19500;
+        bool COOPFailure = false; // Used for the game over screen
+        double cutsceneStartTime = 0; // Set to the current GameTime when the cutscene starts
+        int cutsceneLength = 19500; // The cutscene is 19 and a half seconds long
         bool bossBattleSongCanPlay = false;
         bool finalCreditsSongCanPlay = false;
-        bool gameOverMusicCanPlay = false;
-        bool gameIsWon = false;
+        bool gameOverMusicCanPlay = false;  // Used for music
+        bool gameIsWon = false; // Used to draw the win screen
 
         // Japanese mode cutscene stuff (basically a bunch of timers)
         double cutscenepart1start = 0;
@@ -157,28 +158,27 @@ namespace shooter2playergame
         double transformationstart = 99999999999999999;
         int transformationtime = 3000;
         bool transformpartCanStart = true;
-        bool COOPFailure = false;
         bool bossBattleMusicCheck = true;
 
-        // Enemy Stuff
-        Vector2 enemyPos = new Vector2(570, 255);
-        int enemyScale = 2;
-        int randomNumberToFour = new Random().Next(1, 4);
+        // Enemy Stuff (lol, 1 enemy being the boss)
+        Vector2 enemyPos = new Vector2(570, 255);  // Starting position
+        int enemyScale = 2; // Used to scale the final boss
+        int randomNumberToFour = new Random().Next(1, 5); // Gets a random number between 1 and four
         double MoveStart = 0;
-        float MoveDelay = 3000f;
-        Rectangle enemyRect;
-        bool enemyCanDoAction = true;
-        double enemyTimeSinceLastAction = 0;
-        int fireDelay = 300;
+        float MoveDelay = 3000f; // Used for enemy movement
+        Rectangle enemyRect; // Collision rectangle
+        bool enemyCanDoAction = true; 
+        double enemyTimeSinceLastAction = 0; // Doesn't allow enemy to spam moves
+        int fireDelay = 300; // I would've implemented something like this for the players if I knew how to when starting this project.
         double timeSinceLastFired = 0;
-        int enemyHealth = 500;
-        string enemyHealthString;
-        int OneToThree = new Random().Next(1, 4);
-        int OneOrTwo = new Random().Next(1, 3);
-        int OneInAMillion = new Random().Next(1, 1000001);
-        bool hasSaidHalfHealthLine = false;
-        double timeSinceLastPain = 0;
-        int painSoundDelay = 1500;
+        int enemyHealth = 500; // It used to be 1000 lol.
+        string enemyHealthString; // Used to display enemy health
+        int OneToThree = new Random().Next(1, 4); // Selects a random number between 1 and 3
+        int OneOrTwo = new Random().Next(1, 3); // 1 or 2
+        int OneInAMillion = new Random().Next(1, 1000001); //  one in a million (used to say secret line)
+        bool hasSaidHalfHealthLine = false; // yeah
+        double timeSinceLastPain = 0; 
+        int painSoundDelay = 1500; // makes pain sounds less intrusive
 
         // Listing stuff
         List<Bullet> bullets = new List<Bullet>();
@@ -301,7 +301,7 @@ namespace shooter2playergame
             }
             for (int i = 0; i < smileys.Count; i++)
             {
-                smileys[i].MoveSmiley();
+                smileys[i].MoveSmiley(); // Smileys are basically enemy bullets lol
             }
 
             // Main Menu Stuff
@@ -347,7 +347,7 @@ namespace shooter2playergame
                 MediaPlayer.Play(controlsScreenMusic);
                 MediaPlayer.Volume = 0.4f;
                 MediaPlayer.IsRepeating = true;
-                controlsMusicCanPlay = false;
+                controlsMusicCanPlay = false; // Only plays it once so it isn't spammed
             }
             if (mouseState.X < 200 && mouseState.Y > 405)
             {
@@ -400,16 +400,16 @@ namespace shooter2playergame
                 japanMusicCanPlay = true;
                 escapeKeyWasPressed = true;
                 bossBattleMusicCheck = true;
-                hasSaidHalfHealthLine = false;
+                hasSaidHalfHealthLine = false; // Like return to menu but for japan
             }
             if (Keyboard.GetState().IsKeyUp(Keys.Escape))
             {
-                escapeKeyWasPressed = false;
+                escapeKeyWasPressed = false; // Used so that it isn't detected twice and you go back to main menu
             }
 
             if (gameHasStarted == true || JapGameHasStarted == true)
             {
-                IsMouseVisible = false;
+                IsMouseVisible = false; // Makes the mouse invisible during gameplay
             } else
             {
                IsMouseVisible = true;
@@ -421,7 +421,7 @@ namespace shooter2playergame
                 if (gameTime.TotalGameTime.TotalMilliseconds > redTimeSinceLastScore + scoreDelay && gameTime.TotalGameTime.TotalMilliseconds > blueTimeSinceLastScore + scoreDelay)
                 {
                     RedguyMove(gameTime);
-                    BlueguyMove(gameTime);
+                    BlueguyMove(gameTime); // Put redguy and blueguy's movement in seperate functions
                 }
             }
             // Red and Blue movement end
@@ -495,7 +495,7 @@ namespace shooter2playergame
                 REDspawnDelay = new Random().Next(17000, 22000); // sets the next powerup to spawn in 17 to 22 seconds
                 timeSinceLastSpawnRED = gameTime.TotalGameTime.TotalMilliseconds;
             }
-            if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastSpawnBLUE + BLUEspawnDelay)
+            if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastSpawnBLUE + BLUEspawnDelay) // Same as red, except affecting blue.
             {
                 powerups.Add(new DashPowerup(powerupSprite, new Vector2(randomPositionBLUEX, randomPositionY)));
                 popSound.Play(0.6f, 0, 0);
@@ -520,7 +520,7 @@ namespace shooter2playergame
                     REDpowerupTimer = gameTime.TotalGameTime.TotalMilliseconds; // Sets the timer to the current time
                 }
             }
-            // Blueguy picks up powerup
+            // Blueguy picks up powerup (same as red but blue)
             for (int i = 0; i < powerups.Count; i++)
             {
                 if (blueguyRect.Intersects(powerups[i].powerupRect))
@@ -556,7 +556,7 @@ namespace shooter2playergame
                 MediaPlayer.Stop();
                 japanMusicCanPlay = true;
             }
-            if (japanMusicCanPlay == true)
+            if (japanMusicCanPlay == true) // The following is just for music playing
             {
                 MediaPlayer.Play(japaneseMusic);
                 MediaPlayer.Volume = 0.4f;
@@ -583,7 +583,7 @@ namespace shooter2playergame
                 MediaPlayer.Volume = 0.4f;
                 MediaPlayer.IsRepeating = true;
                 finalCreditsSongCanPlay = false;
-            }
+            } // Music playing end
             if (isInJapan == true)
             {
                 if (mouseState.X > 80 && mouseState.X < 325 && mouseState.Y < 235 && mouseState.Y > 115)
@@ -604,7 +604,7 @@ namespace shooter2playergame
                 }
                 if (overExitButton == true && mouseState.LeftButton == ButtonState.Pressed)
                 {
-                    ReturnToMenu();
+                    ReturnToMenu(); // Same menu stuff but as a japanese mode
                 }
                 if (overPlayJapButton == true && mouseState.LeftButton == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Enter))
                 {
@@ -627,7 +627,7 @@ namespace shooter2playergame
                     cutscenepart1time = 19000;
                     transformationstart = 99999999999999999;
                     transformationtime = 3000;
-                    transformpartCanStart = true;
+                    transformpartCanStart = true; // Sets the cutscene stuff to default when the game starts.
                 }
             }
             if (JapGameHasStarted == true)
@@ -639,13 +639,13 @@ namespace shooter2playergame
                     transformationtime = 0;
                     transformpartCanStart = false;
                     cutscenepart1time = 0;
-                    transformationstart = gameTime.TotalGameTime.TotalMilliseconds;
+                    transformationstart = gameTime.TotalGameTime.TotalMilliseconds; // On an enter press it skips the cutscene
                 }
                 if (gameTime.TotalGameTime.TotalMilliseconds > cutsceneStartTime + cutsceneLength)
                 {
                     if (redIsAliveCOOP == true)
                     {
-                        RedguyMoveJAPAN(gameTime);
+                        RedguyMoveJAPAN(gameTime); // Seperate japan movement so that they stop in different places
                     }
                     if (blueIsAliveCOOP)
                     {
@@ -655,23 +655,24 @@ namespace shooter2playergame
                 if (gameTime.TotalGameTime.TotalMilliseconds > cutscenepart1start + 16000 && transformpartCanStart == true)
                 {
                     transformationstart = gameTime.TotalGameTime.TotalMilliseconds;
-                    BoomSound.Play(0.5f, 0, 0);
+                    BoomSound.Play(0.5f, 0, 0); // Plays a boom sound when he is revealed to be yellowguy
                     transformpartCanStart = false;
                 }
                 if (gameTime.TotalGameTime.TotalMilliseconds > transformationstart + transformationtime)
                 {                    
-                    EnemyAction(gameTime);
+                    EnemyAction(gameTime); // After the tranformation the boss performs his actions
                     if (enemyCanDoAction == true)
                     {
                         enemyTimeSinceLastAction = gameTime.TotalGameTime.TotalMilliseconds;
                         enemyCanDoAction = false;
                     }
-                    if (gameTime.TotalGameTime.TotalMilliseconds > enemyTimeSinceLastAction + 1000)
+                    if (gameTime.TotalGameTime.TotalMilliseconds > enemyTimeSinceLastAction + 1000) // Used so that he doesn't spam actions (it looks weird)
                     {
-                        randomNumberToFour = new Random().Next(1, 4);
+                        randomNumberToFour = new Random().Next(1, 5);
                         enemyCanDoAction = true;
                     }
                 }
+                // Redguy and Blueguy smiley collisions (they die)
                 for (int i = 0; i < smileys.Count; i++)
                 {
                     if (redguyRect.Intersects(smileys[i].smileyRect))
@@ -697,30 +698,31 @@ namespace shooter2playergame
                         }
                     }
                 }
-                for (int i = 0; i < bullets.Count; i++)
+                // Final boss bullet collisions (he loses health)
+                for (int i = 0; i < bullets.Count; i++) // for every bullet in the list
                 {
-                    if (enemyRect.Intersects(bullets[i].bulletRect))
+                    if (enemyRect.Intersects(bullets[i].bulletRect)) // if enemy intersects with bullet i (the one that hit him)
                     {
-                        bullets.RemoveAt(i);
-                        enemyHealth--;
-                        if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastPain + painSoundDelay)
+                        bullets.RemoveAt(i); // remove bullet i
+                        enemyHealth--; // remove 1 health
+                        if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastPain + painSoundDelay) // if the gametime is higher than the timesincelast pain and the paindelay
                         {
-                            OneToThree = new Random().Next(1, 4);
-                            OneOrTwo = new Random().Next(1, 3);
+                            OneToThree = new Random().Next(1, 4); // get a new random number from 1 to 3
+                            OneOrTwo = new Random().Next(1, 3); // get 1 or 2
                             switch (OneToThree)
                             {
                                 case 1:
                                     AghSound.Play(0.3f, 0, 0);
-                                    break;
+                                    break; // if it's 1, go 'Agh'
                                 case 2:
                                     GruntSound.Play(0.3f, 0, 0);
-                                    break;
+                                    break; // if it's 2, grunt
                                 case 3:
                                     UghSound.Play(0.3f, 0, 0);
-                                    break;
+                                    break; // if it's 3, go 'Ugh'
                                 default:
                                     AghSound.Play(0.3f, 0, 0);
-                                    break;
+                                    break; // if none, go 'Agh' again (just in case)
                             }
                             switch (OneOrTwo)
                             {
@@ -733,52 +735,52 @@ namespace shooter2playergame
                                 default:
                                     painSoundDelay = 1000;
                                     break;
-                            }
+                            } // Either he waits 500ms to make a pain sound again, or he waits 1500ms.
                             timeSinceLastPain = gameTime.TotalGameTime.TotalMilliseconds;
                         }
                     }
                 }
-                if (enemyHealth <= 250)
+                if (enemyHealth <= 250) // If the enemy's health is under or equal to half
                 {
-                    OneInAMillion = new Random().Next(1, 1000001);
-                    if (hasSaidHalfHealthLine == false)
+                    OneInAMillion = new Random().Next(1, 1000001); // get a number between 1 in a million
+                    if (hasSaidHalfHealthLine == false) // if he hasn't said the line yet
                     {
-                        if (OneInAMillion == 1337)
+                        if (OneInAMillion == 1337) // if the number is 1337
                         {
-                            FuckinStupid.Play(0.5f, 0, 0);
+                            FuckinStupid.Play(0.5f, 0, 0); // play the secret voiceline
                         }
                         else
                         {
-                            JustDieAlready.Play(0.5f, 0, 0);
+                            JustDieAlready.Play(0.5f, 0, 0); // otherwise play the normal one
                         }
                     }
-                    hasSaidHalfHealthLine = true;
+                    hasSaidHalfHealthLine = true; // he can't say the half health line until the boss battle is started again.
                 }
-                if (blueIsAliveCOOP == false && redIsAliveCOOP == false)
+                if (blueIsAliveCOOP == false && redIsAliveCOOP == false) // if they both die
                 {
                     smileys.Clear();
-                    bullets.Clear();
-                    COOPFailure = true;
+                    bullets.Clear(); // clear bullets and smileys
+                    COOPFailure = true; // they have failed
                     isInDojo = false;
                     JapGameHasStarted = false;
-                    gameOverMusicCanPlay = true;
+                    gameOverMusicCanPlay = true; // play game over music
                 }
-                if (enemyHealth <= 0)
+                if (enemyHealth <= 0) // when the enemy health reaches zero
                 {
-                    JapGameHasStarted = false;
-                    MediaPlayer.Stop();
-                    bullets.Clear();
-                    smileys.Clear();
-                    gameIsWon = true;
+                    JapGameHasStarted = false; // game has ended
+                    MediaPlayer.Stop(); // stops playing the boss music
+                    bullets.Clear(); 
+                    smileys.Clear(); // clears bullets and smileys
+                    gameIsWon = true; // the game is won
                     isInDojo = false;
-                    finalCreditsSongCanPlay = true;
+                    finalCreditsSongCanPlay = true; // plays the final credits song
                 }
             }
 
             base.Update(gameTime);
         }
 
-        void ResetPos() // Self explanitory
+        void ResetPos() // Self explanatory
         {
             redguyPos.X = 100;
             redguyPos.Y = 175;
@@ -794,7 +796,7 @@ namespace shooter2playergame
             blueguyPos.Y = 330;
             redIsAliveCOOP = true;
             blueIsAliveCOOP = true;
-        }
+        } // same as ResetPos but uses the default japanese mode positions
 
         void RedguyMove(GameTime gameTime)
         {
@@ -876,7 +878,7 @@ namespace shooter2playergame
                     }
                 }
             }
-        }
+        } // THIS SAME BASE IS USED TO REDGUYJAPAN WITH A FEW DIFFERENCES, SAME GOES FOR BLUE
         void RedguyMoveJAPAN(GameTime gameTime)
         {
             if (redIsDodging == false)
@@ -1119,51 +1121,51 @@ namespace shooter2playergame
             redScore = 0;
             blueScore = 0;
             ResetPos(); // on pressing escape it resets everything and returns to main menu
-        }
+        } // self explanatory
 
         public void EnemyAction(GameTime gameTime)
         {
-            if (bossBattleMusicCheck == true)
+            if (bossBattleMusicCheck == true) // if the bossbattle music is not playing, play it
             {
                 bossBattleSongCanPlay = true;
                 bossBattleMusicCheck = false;
             }
-            if (gameTime.TotalGameTime.TotalMilliseconds > MoveStart + MoveDelay)
+            if (gameTime.TotalGameTime.TotalMilliseconds > MoveStart + MoveDelay) // if he hasn't done a move for however long the move delay is, do a move
             {
-                if (randomNumberToFour == 1 && enemyPos.Y > 180)
+                if (randomNumberToFour == 1 && enemyPos.Y > 180) // if the random number to four is one and he's lower than 180
                 {
-                    MoveEnemyUp();
+                    MoveEnemyUp(); // move him up
                 }
-                else if (randomNumberToFour == 1 && enemyPos.Y <= 180)
+                else if (randomNumberToFour == 1 && enemyPos.Y <= 180) // if his y position is at 180 or higher
                 {
-                    MoveEnemyDown();
-                    randomNumberToFour = 2;
+                    MoveEnemyDown(); // move him down
+                    randomNumberToFour = 2; // set the random number to 2
                 }
-                if (randomNumberToFour == 2 && enemyPos.Y < 370)
+                if (randomNumberToFour == 2 && enemyPos.Y < 370) // if his position is more than 370 and the random number is 2
                 {
-                    MoveEnemyDown();
+                    MoveEnemyDown(); // move him down
                 }
-                else if (randomNumberToFour == 2 && enemyPos.Y >= 370)
+                else if (randomNumberToFour == 2 && enemyPos.Y >= 370) // otherwise if he's at 370
                 {
-                    MoveEnemyUp();
-                    randomNumberToFour = 1;
+                    MoveEnemyUp(); // move him up
+                    randomNumberToFour = 1; // set the number to one
                 } else
                 {
-                    EnemyFire(gameTime);
+                    EnemyFire(gameTime); // otherwise shoot if the number is anything else
                 }
             }
         }
         void MoveEnemyUp()
         {
-            enemyPos.Y -= 3;
+            enemyPos.Y -= 3; // moves the enemy up by 3 every frame
         }
         void MoveEnemyDown()
         {
-            enemyPos.Y += 3;
+            enemyPos.Y += 3; // moves the enemy down by 3 every frame
         }
         void EnemyFire(GameTime gameTime)
         {
-            if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastFired + fireDelay)
+            if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastFired + fireDelay) // Same as how blueguy and redguy fire but with an added firedelay
             {
                 smileys.Add(new Smiley(smileySprite, enemyPos + new Vector2(-20, 50), new Vector2(-7, 0)));
                 timeSinceLastFired = gameTime.TotalGameTime.TotalMilliseconds;
