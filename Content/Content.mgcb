@@ -25,6 +25,18 @@
 /processorParam:TextureFormat=Color
 /build:Backgrounds/Controlsscreen.png
 
+#begin Backgrounds/ControlsscreenALT.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Backgrounds/ControlsscreenALT.png
+
 #begin Backgrounds/Desertbackground.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -97,6 +109,30 @@
 /processorParam:TextureFormat=Color
 /build:Backgrounds/YellowguyBGBars.png
 
+#begin Backgrounds/YOULOSE.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Backgrounds/YOULOSE.png
+
+#begin Backgrounds/YoureWinner.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Backgrounds/YoureWinner.png
+
 #begin Enemies/finalboss1.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -120,18 +156,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Enemies/Smiley.png
-
-#begin Enemies/Yellowguy.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Enemies/Yellowguy.png
 
 #begin Enemies/YellowguyARMS.png
 /importer:TextureImporter
@@ -183,17 +207,35 @@
 /processorParam:TextureFormat=Color
 /build:Items/Fastshoe.png
 
+#begin music/BossBattleMusic.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:music/BossBattleMusic.mp3
+
 #begin music/controlsscreenmusic.mp3
 /importer:Mp3Importer
 /processor:SongProcessor
 /processorParam:Quality=Best
 /build:music/controlsscreenmusic.mp3
 
+#begin music/EndCreditsSong.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:music/EndCreditsSong.mp3
+
 #begin music/Finalbossspeech.mp3
 /importer:Mp3Importer
 /processor:SongProcessor
 /processorParam:Quality=Best
 /build:music/Finalbossspeech.mp3
+
+#begin music/GameOverMusic.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:music/GameOverMusic.mp3
 
 #begin music/japanesemusic.mp3
 /importer:Mp3Importer
@@ -315,6 +357,12 @@
 /processorParam:TextureFormat=Color
 /build:Players/Redguydodgelarge.png
 
+#begin sound effects/Agh.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:sound effects/Agh.mp3
+
 #begin sound effects/bang.mp3
 /importer:Mp3Importer
 /processor:SoundEffectProcessor
@@ -327,11 +375,35 @@
 /processorParam:Quality=Best
 /build:sound effects/bling.mp3
 
+#begin sound effects/Boom.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:sound effects/Boom.mp3
+
 #begin sound effects/deathsound.mp3
 /importer:Mp3Importer
 /processor:SoundEffectProcessor
 /processorParam:Quality=Best
 /build:sound effects/deathsound.mp3
+
+#begin sound effects/FuckinStupid.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:sound effects/FuckinStupid.mp3
+
+#begin sound effects/Grunt.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:sound effects/Grunt.mp3
+
+#begin sound effects/JustDieAlready.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:sound effects/JustDieAlready.mp3
 
 #begin sound effects/pew.mp3
 /importer:Mp3Importer
@@ -344,6 +416,12 @@
 /processor:SoundEffectProcessor
 /processorParam:Quality=Best
 /build:sound effects/pop.mp3
+
+#begin sound effects/Ugh.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:sound effects/Ugh.mp3
 
 #begin sound effects/walksound.mp3
 /importer:Mp3Importer

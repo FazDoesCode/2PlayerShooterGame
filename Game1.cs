@@ -31,12 +31,14 @@ namespace shooter2playergame
         Texture2D smileySprite;
         Texture2D dojoBackground;
         Texture2D finalBoss;
-        Texture2D Yellowguy;
         Texture2D YellowguyARMS;
         Texture2D blueguyCOOP;
         Texture2D blueguyDodgeCOOP;
         Texture2D graveStone;
         Texture2D yellowguyBG;
+        Texture2D LoseScreen;
+        Texture2D YoureWinner;
+        Texture2D controlsScreenAlt;
 
         // Declaring fonts
         SpriteFont font;
@@ -50,8 +52,18 @@ namespace shooter2playergame
         SoundEffect deathSound;
         SoundEffect popSound;
         SoundEffect blingSound;
+        SoundEffect BoomSound;
+        SoundEffect AghSound;
+        SoundEffect GruntSound;
+        SoundEffect UghSound;
+        SoundEffect JustDieAlready;
+        SoundEffect FuckinStupid;
+        Song finalBossSpeech;
         Song menuMusic;
         Song controlsScreenMusic;
+        Song BossBattleMusic;
+        Song GameOverMusic;
+        Song EndCreditsSong;
 
         // Position & walking stuff
         Vector2 redguyPos = new Vector2(100, 175);
@@ -84,6 +96,8 @@ namespace shooter2playergame
         bool isInMainMenu = true;
         public bool gameHasStarted = false; // Also used to determine whether or not the players can move
         bool overControlsButton = false;
+        bool overAltControlsButton = false;
+        bool inAltControlsMenu = false;
         bool overMap1Button = false; // Used for button selection
         bool overMap2Button = false; // Used for the button selection
         bool menuMusicCanPlay = true; // self explanitory
@@ -130,10 +144,46 @@ namespace shooter2playergame
         bool JapGameHasStarted = false;
         bool blueIsAliveCOOP = true;
         bool redIsAliveCOOP = true;
+        double cutsceneStartTime = 0;
+        int cutsceneLength = 19500;
+        bool bossBattleSongCanPlay = false;
+        bool finalCreditsSongCanPlay = false;
+        bool gameOverMusicCanPlay = false;
+        bool gameIsWon = false;
+
+        // Japanese mode cutscene stuff (basically a bunch of timers)
+        double cutscenepart1start = 0;
+        int cutscenepart1time = 19000;
+        double transformationstart = 99999999999999999;
+        int transformationtime = 3000;
+        bool transformpartCanStart = true;
+        bool COOPFailure = false;
+        bool bossBattleMusicCheck = true;
+
+        // Enemy Stuff
+        Vector2 enemyPos = new Vector2(570, 255);
+        int enemyScale = 2;
+        int randomNumberToFour = new Random().Next(1, 4);
+        double MoveStart = 0;
+        float MoveDelay = 3000f;
+        Rectangle enemyRect;
+        bool enemyCanDoAction = true;
+        double enemyTimeSinceLastAction = 0;
+        int fireDelay = 300;
+        double timeSinceLastFired = 0;
+        int enemyHealth = 500;
+        string enemyHealthString;
+        int OneToThree = new Random().Next(1, 4);
+        int OneOrTwo = new Random().Next(1, 3);
+        int OneInAMillion = new Random().Next(1, 1000001);
+        bool hasSaidHalfHealthLine = false;
+        double timeSinceLastPain = 0;
+        int painSoundDelay = 1500;
 
         // Listing stuff
         List<Bullet> bullets = new List<Bullet>();
-        List<DashPowerup> powerups = new List<DashPowerup>(); // Using lists so there can be multiple on screen
+        List<DashPowerup> powerups = new List<DashPowerup>();
+        List<Smiley> smileys = new List<Smiley>(); // Using lists so there can be multiple on screen
 
         // Declaring rectangle so I can use it in collisions
         Rectangle redguyRect;
@@ -153,11 +203,13 @@ namespace shooter2playergame
         Keys blueguyMoveLeft = Keys.Left;
         Keys blueguyMoveRight = Keys.Right;
         Keys blueguyShoot = Keys.OemPeriod;
+        Keys blueguyShoot2 = Keys.NumPad1;
         Keys blueguyDodge = Keys.OemComma;
+        Keys blueguyDodge2 = Keys.NumPad2;
 
         // Blue and Red speed
-        int redguySpeed = 3;
-        int blueguySpeed = 3; // Red and blueguy speed are seperate integers so they can be affected by powerups seperately
+        float redguySpeed = 3;
+        float blueguySpeed = 3; // Red and blueguy speed are seperate integers so they can be affected by powerups seperately
         int dodgeDistance = 60;
 
         public Game1()
@@ -193,13 +245,15 @@ namespace shooter2playergame
             // Loading enemies
             smileySprite = Content.Load<Texture2D>("Enemies/Smiley");
             finalBoss = Content.Load<Texture2D>("Enemies/finalboss1");
-            Yellowguy = Content.Load<Texture2D>("Enemies/Yellowguy");
             YellowguyARMS = Content.Load<Texture2D>("Enemies/YellowguyARMS");
 
             // Loading menu sprites
             MainMenuSprite = Content.Load<Texture2D>("Backgrounds/MainMenu");
             controlsScreen = Content.Load<Texture2D>("Backgrounds/Controlsscreen");
+            controlsScreenAlt = Content.Load<Texture2D>("Backgrounds/ControlsscreenALT");
             japaneseMenu = Content.Load<Texture2D>("Backgrounds/Japanesemenu");
+            LoseScreen = Content.Load<Texture2D>("Backgrounds/YOULOSE");
+            YoureWinner = Content.Load<Texture2D>("Backgrounds/YoureWinner");
 
             // Loading gameplay backgrounds
             backgroundSprite = Content.Load<Texture2D>("Backgrounds/Desertbackground");
@@ -215,6 +269,10 @@ namespace shooter2playergame
             menuMusic = Content.Load<Song>("music/menumusic");
             controlsScreenMusic = Content.Load<Song>("music/controlsscreenmusic");
             japaneseMusic = Content.Load<Song>("music/japanesemusic");
+            finalBossSpeech = Content.Load<Song>("music/Finalbossspeech");
+            BossBattleMusic = Content.Load<Song>("music/BossBattleMusic");
+            GameOverMusic = Content.Load<Song>("music/GameOverMusic");
+            EndCreditsSong = Content.Load<Song>("music/EndCreditsSong");
 
             // Loading sound effects
             pew = Content.Load<SoundEffect>("sound effects/pew");
@@ -224,6 +282,12 @@ namespace shooter2playergame
             woosh = Content.Load<SoundEffect>("sound effects/woosh");
             popSound = Content.Load<SoundEffect>("sound effects/pop");
             blingSound = Content.Load<SoundEffect>("sound effects/bling");
+            BoomSound = Content.Load<SoundEffect>("sound effects/Boom");
+            AghSound = Content.Load<SoundEffect>("sound effects/Agh");
+            GruntSound = Content.Load<SoundEffect>("sound effects/Grunt");
+            UghSound = Content.Load<SoundEffect>("sound effects/Ugh");
+            JustDieAlready = Content.Load<SoundEffect>("sound effects/JustDieAlready");
+            FuckinStupid = Content.Load<SoundEffect>("sound effects/FuckinStupid");
         }
 
         protected override void Update(GameTime gameTime)
@@ -235,17 +299,9 @@ namespace shooter2playergame
             {
                 bullets[i].MoveBullet(); // Calls the MoveBullet() function for every bullet in the list
             }
-
-            // Debugging position code
-            if (Keyboard.GetState().IsKeyDown(Keys.P))
+            for (int i = 0; i < smileys.Count; i++)
             {
-                Debug.WriteLine("RedguyPos  = " + redguyPos.X + "," + redguyPos.Y);
-                Debug.WriteLine("BlueguyPos = " + blueguyPos.X + "," + blueguyPos.Y); // Used for debugging player position
-            }
-            if (mouseState.RightButton == ButtonState.Pressed)
-            {
-                Debug.WriteLine(mouseState.X);
-                Debug.WriteLine(mouseState.Y); // Used for debugging mouse position (for the menus)
+                smileys[i].MoveSmiley();
             }
 
             // Main Menu Stuff
@@ -308,31 +364,50 @@ namespace shooter2playergame
                 MediaPlayer.Stop();
                 controlsMusicCanPlay = true;
             }
+            if (isInControlsMenu == true)
+            {
+                if (mouseState.X > 285 && mouseState.X < 485 && mouseState.Y > 10 && mouseState.Y < 85)
+                {
+                    overAltControlsButton = true;
+                } else
+                {
+                    overAltControlsButton = false;
+                }
+                if (overAltControlsButton == true && mouseState.LeftButton == ButtonState.Pressed)
+                {
+                    inAltControlsMenu = true;
+                }
+            }
 
             // Exiting the game / Returning to menu
             if (escapeKeyWasPressed == false)
             {
-                if (Keyboard.GetState().IsKeyDown(Keys.Escape) && gameHasStarted == true || Keyboard.GetState().IsKeyDown(Keys.Escape) && isInControlsMenu == true || Keyboard.GetState().IsKeyDown(Keys.Escape) && isInJapan == true)
+                if (Keyboard.GetState().IsKeyDown(Keys.Escape) && gameHasStarted == true || Keyboard.GetState().IsKeyDown(Keys.Escape) && isInControlsMenu == true || Keyboard.GetState().IsKeyDown(Keys.Escape) && inAltControlsMenu == true || Keyboard.GetState().IsKeyDown(Keys.Escape) && isInJapan == true || Keyboard.GetState().IsKeyDown(Keys.Escape) && gameIsWon == true)
                 {
                     ReturnToMenu();
                 }
             }
-            if (Keyboard.GetState().IsKeyDown(Keys.Escape) && JapGameHasStarted == true)
+            if (Keyboard.GetState().IsKeyDown(Keys.Escape) && JapGameHasStarted == true || Keyboard.GetState().IsKeyDown(Keys.Escape) && COOPFailure == true)
             {
                 MediaPlayer.Stop();
+                enemyHealth = 500;
                 isInJapan = true;
                 JapGameHasStarted = false;
                 isInDojo = false;
+                COOPFailure = false;
                 bullets.Clear();
+                smileys.Clear();
                 japanMusicCanPlay = true;
                 escapeKeyWasPressed = true;
+                bossBattleMusicCheck = true;
+                hasSaidHalfHealthLine = false;
             }
             if (Keyboard.GetState().IsKeyUp(Keys.Escape))
             {
                 escapeKeyWasPressed = false;
             }
 
-            if (gameHasStarted == true)
+            if (gameHasStarted == true || JapGameHasStarted == true)
             {
                 IsMouseVisible = false;
             } else
@@ -439,7 +514,7 @@ namespace shooter2playergame
                 {
                     powerups.RemoveAt(i); // Removes the picked up powerup
                     blingSound.Play(0.6f, 0, 0); // Plays a bling sound
-                    redguySpeed = 5; // Makes redguy faster
+                    redguySpeed = redguySpeed * 1.5f; // Makes redguy faster
                     redDodgeDelay = 850; // Makes his dodge delay less, allowing him to dodge faster
                     redWalkSoundDelay = 200; // Halves the walk sound delay, so it plays more freqently
                     REDpowerupTimer = gameTime.TotalGameTime.TotalMilliseconds; // Sets the timer to the current time
@@ -452,7 +527,7 @@ namespace shooter2playergame
                 {
                     powerups.RemoveAt(i);
                     blingSound.Play(0.6f, 0, 0);
-                    blueguySpeed = 5;
+                    blueguySpeed = blueguySpeed * 1.5f;
                     blueDodgeDelay = 850;
                     blueWalkSoundDelay = 200;
                     BLUEpowerupTimer = gameTime.TotalGameTime.TotalMilliseconds;
@@ -488,6 +563,27 @@ namespace shooter2playergame
                 MediaPlayer.IsRepeating = true;
                 japanMusicCanPlay = false;
             }
+            if (bossBattleSongCanPlay == true)
+            {
+                MediaPlayer.Play(BossBattleMusic);
+                MediaPlayer.Volume = 0.5f;
+                MediaPlayer.IsRepeating = true;
+                bossBattleSongCanPlay = false;
+            }
+            if (gameOverMusicCanPlay == true)
+            {
+                MediaPlayer.Play(GameOverMusic);
+                MediaPlayer.Volume = 0.4f;
+                MediaPlayer.IsRepeating = true;
+                gameOverMusicCanPlay = false;
+            }
+            if (finalCreditsSongCanPlay == true)
+            {
+                MediaPlayer.Play(EndCreditsSong);
+                MediaPlayer.Volume = 0.4f;
+                MediaPlayer.IsRepeating = true;
+                finalCreditsSongCanPlay = false;
+            }
             if (isInJapan == true)
             {
                 if (mouseState.X > 80 && mouseState.X < 325 && mouseState.Y < 235 && mouseState.Y > 115)
@@ -510,24 +606,172 @@ namespace shooter2playergame
                 {
                     ReturnToMenu();
                 }
-                if (overPlayJapButton == true && mouseState.LeftButton == ButtonState.Pressed)
+                if (overPlayJapButton == true && mouseState.LeftButton == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Enter))
                 {
                     MediaPlayer.Stop();
                     ResetPosJapan();
                     isInJapan = false;
                     isInDojo = true;
                     JapGameHasStarted = true;
+                    transformpartCanStart = true;
+                    cutsceneStartTime = gameTime.TotalGameTime.TotalMilliseconds;
+                    MediaPlayer.Play(finalBossSpeech);
+                    MediaPlayer.Volume = 0.2f;
+                    MediaPlayer.IsRepeating = false;
+                    cutscenepart1start = gameTime.TotalGameTime.TotalMilliseconds;
+                    enemyHealth = 500;
+                    hasSaidHalfHealthLine = false;
+
+                    cutscenepart1start = gameTime.TotalGameTime.TotalMilliseconds;
+                    cutsceneLength = 19500;
+                    cutscenepart1time = 19000;
+                    transformationstart = 99999999999999999;
+                    transformationtime = 3000;
+                    transformpartCanStart = true;
                 }
             }
             if (JapGameHasStarted == true)
             {
-                if (redIsAliveCOOP == true)
+                if (Keyboard.GetState().IsKeyDown(Keys.Enter))
                 {
-                    RedguyMoveJAPAN(gameTime);
+                    MediaPlayer.Stop();
+                    cutsceneLength = 0;
+                    transformationtime = 0;
+                    transformpartCanStart = false;
+                    cutscenepart1time = 0;
+                    transformationstart = gameTime.TotalGameTime.TotalMilliseconds;
                 }
-                if (blueIsAliveCOOP)
+                if (gameTime.TotalGameTime.TotalMilliseconds > cutsceneStartTime + cutsceneLength)
                 {
-                    BlueguyMoveJAPAN(gameTime);
+                    if (redIsAliveCOOP == true)
+                    {
+                        RedguyMoveJAPAN(gameTime);
+                    }
+                    if (blueIsAliveCOOP)
+                    {
+                        BlueguyMoveJAPAN(gameTime);
+                    }
+                }
+                if (gameTime.TotalGameTime.TotalMilliseconds > cutscenepart1start + 16000 && transformpartCanStart == true)
+                {
+                    transformationstart = gameTime.TotalGameTime.TotalMilliseconds;
+                    BoomSound.Play(0.5f, 0, 0);
+                    transformpartCanStart = false;
+                }
+                if (gameTime.TotalGameTime.TotalMilliseconds > transformationstart + transformationtime)
+                {                    
+                    EnemyAction(gameTime);
+                    if (enemyCanDoAction == true)
+                    {
+                        enemyTimeSinceLastAction = gameTime.TotalGameTime.TotalMilliseconds;
+                        enemyCanDoAction = false;
+                    }
+                    if (gameTime.TotalGameTime.TotalMilliseconds > enemyTimeSinceLastAction + 1000)
+                    {
+                        randomNumberToFour = new Random().Next(1, 4);
+                        enemyCanDoAction = true;
+                    }
+                }
+                for (int i = 0; i < smileys.Count; i++)
+                {
+                    if (redguyRect.Intersects(smileys[i].smileyRect))
+                    {
+                        if (gameTime.TotalGameTime.TotalMilliseconds > redInvulnTimer + redInvulnTime)
+                        {
+                            if (redIsAliveCOOP == true)
+                            {
+                                deathSound.Play(0.5f, 0, 0);
+                            }
+                            redIsAliveCOOP = false;
+                        }
+                    }
+                    if (blueguyRect.Intersects(smileys[i].smileyRect))
+                    {
+                        if (gameTime.TotalGameTime.TotalMilliseconds > blueInvulnTimer + blueInvulnTime)
+                        {
+                            if (blueIsAliveCOOP == true)
+                            {
+                                deathSound.Play(0.5f, 0, 0);
+                            }
+                            blueIsAliveCOOP = false;
+                        }
+                    }
+                }
+                for (int i = 0; i < bullets.Count; i++)
+                {
+                    if (enemyRect.Intersects(bullets[i].bulletRect))
+                    {
+                        bullets.RemoveAt(i);
+                        enemyHealth--;
+                        if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastPain + painSoundDelay)
+                        {
+                            OneToThree = new Random().Next(1, 4);
+                            OneOrTwo = new Random().Next(1, 3);
+                            switch (OneToThree)
+                            {
+                                case 1:
+                                    AghSound.Play(0.3f, 0, 0);
+                                    break;
+                                case 2:
+                                    GruntSound.Play(0.3f, 0, 0);
+                                    break;
+                                case 3:
+                                    UghSound.Play(0.3f, 0, 0);
+                                    break;
+                                default:
+                                    AghSound.Play(0.3f, 0, 0);
+                                    break;
+                            }
+                            switch (OneOrTwo)
+                            {
+                                case 1:
+                                    painSoundDelay = 500;
+                                    break;
+                                case 2:
+                                    painSoundDelay = 1500;
+                                    break;
+                                default:
+                                    painSoundDelay = 1000;
+                                    break;
+                            }
+                            timeSinceLastPain = gameTime.TotalGameTime.TotalMilliseconds;
+                        }
+                    }
+                }
+                if (enemyHealth <= 250)
+                {
+                    OneInAMillion = new Random().Next(1, 1000001);
+                    if (hasSaidHalfHealthLine == false)
+                    {
+                        if (OneInAMillion == 1337)
+                        {
+                            FuckinStupid.Play(0.5f, 0, 0);
+                        }
+                        else
+                        {
+                            JustDieAlready.Play(0.5f, 0, 0);
+                        }
+                    }
+                    hasSaidHalfHealthLine = true;
+                }
+                if (blueIsAliveCOOP == false && redIsAliveCOOP == false)
+                {
+                    smileys.Clear();
+                    bullets.Clear();
+                    COOPFailure = true;
+                    isInDojo = false;
+                    JapGameHasStarted = false;
+                    gameOverMusicCanPlay = true;
+                }
+                if (enemyHealth <= 0)
+                {
+                    JapGameHasStarted = false;
+                    MediaPlayer.Stop();
+                    bullets.Clear();
+                    smileys.Clear();
+                    gameIsWon = true;
+                    isInDojo = false;
+                    finalCreditsSongCanPlay = true;
                 }
             }
 
@@ -633,7 +877,6 @@ namespace shooter2playergame
                 }
             }
         }
-
         void RedguyMoveJAPAN(GameTime gameTime)
         {
             if (redIsDodging == false)
@@ -659,7 +902,7 @@ namespace shooter2playergame
                     if (redfireDelay == false)
                     {
                         bullets.Add(new Bullet(bulletSprite, redguyPos + new Vector2(50, 40), new Vector2(7, 0)));
-                        pew.Play(0.2f, 0, 0);
+                        pew.Play(0.1f, 0, 0);
                         redfireDelay = true;
                     }
                 }
@@ -736,7 +979,7 @@ namespace shooter2playergame
                         blueTimeSinceLastWalked = gameTime.TotalGameTime.TotalMilliseconds;
                     }
                 }
-                if (Keyboard.GetState().IsKeyDown(blueguyShoot))
+                if (Keyboard.GetState().IsKeyDown(blueguyShoot) || Keyboard.GetState().IsKeyDown(blueguyShoot2))
                 {
                     if (bluefireDelay == false)
                     {
@@ -745,7 +988,7 @@ namespace shooter2playergame
                         bluefireDelay = true;
                     }
                 }
-                if (Keyboard.GetState().IsKeyUp(blueguyShoot))
+                if (Keyboard.GetState().IsKeyUp(blueguyShoot) && Keyboard.GetState().IsKeyUp(blueguyShoot2))
                 {
                     bluefireDelay = false;
                 }
@@ -753,22 +996,22 @@ namespace shooter2playergame
                 // Blue dodging
                 if (gameTime.TotalGameTime.TotalMilliseconds > bluetimeSinceLastDodge + blueDodgeDelay)
                 {
-                    if (Keyboard.GetState().IsKeyDown(blueguyDodge) && Keyboard.GetState().IsKeyDown(blueguyMoveDown) && blueguyPos.Y <= 346)
+                    if (Keyboard.GetState().IsKeyDown(blueguyDodge) && Keyboard.GetState().IsKeyDown(blueguyMoveDown) && blueguyPos.Y <= 346  || Keyboard.GetState().IsKeyDown(blueguyDodge2) && Keyboard.GetState().IsKeyDown(blueguyMoveDown) && blueguyPos.Y <= 346)
                     {
                         blueguyPos.Y += dodgeDistance;
                         BlueDodge(gameTime);
                     }
-                    if (Keyboard.GetState().IsKeyDown(blueguyDodge) && Keyboard.GetState().IsKeyDown(blueguyMoveUp) && blueguyPos.Y >= 42)
+                    if (Keyboard.GetState().IsKeyDown(blueguyDodge) && Keyboard.GetState().IsKeyDown(blueguyMoveUp) && blueguyPos.Y >= 42  || Keyboard.GetState().IsKeyDown(blueguyDodge2) && Keyboard.GetState().IsKeyDown(blueguyMoveUp) && blueguyPos.Y >= 42)
                     {
                         blueguyPos.Y -= dodgeDistance;
                         BlueDodge(gameTime);
                     }
-                    if (Keyboard.GetState().IsKeyDown(blueguyDodge) && Keyboard.GetState().IsKeyDown(blueguyMoveRight) && blueguyPos.X <= 684)
+                    if (Keyboard.GetState().IsKeyDown(blueguyDodge) && Keyboard.GetState().IsKeyDown(blueguyMoveRight) && blueguyPos.X <= 684 || Keyboard.GetState().IsKeyDown(blueguyDodge2) && Keyboard.GetState().IsKeyDown(blueguyMoveRight) && blueguyPos.X <= 684)
                     {
                         blueguyPos.X += dodgeDistance;
                         BlueDodge(gameTime);
                     }
-                    if (Keyboard.GetState().IsKeyDown(blueguyDodge) && Keyboard.GetState().IsKeyDown(blueguyMoveLeft) && blueguyPos.X >= 450)
+                    if (Keyboard.GetState().IsKeyDown(blueguyDodge) && Keyboard.GetState().IsKeyDown(blueguyMoveLeft) && blueguyPos.X >= 450 || Keyboard.GetState().IsKeyDown(blueguyDodge2) && Keyboard.GetState().IsKeyDown(blueguyMoveLeft) && blueguyPos.X >= 450)
                     {
                         blueguyPos.X -= dodgeDistance;
                         BlueDodge(gameTime);
@@ -797,16 +1040,16 @@ namespace shooter2playergame
                 {
                     blueguyPos.X += blueguySpeed;
                 }
-                if (Keyboard.GetState().IsKeyDown(blueguyShoot))
+                if (Keyboard.GetState().IsKeyDown(blueguyShoot) || Keyboard.GetState().IsKeyDown(blueguyShoot2))
                 {
                     if (bluefireDelay == false)
                     {
                         bullets.Add(new Bullet(bulletSprite, blueguyPos + new Vector2(50, 40), new Vector2(7, 0)));
-                        bang.Play(0.2f, 0, 0);
+                        bang.Play(0.1f, 0, 0);
                         bluefireDelay = true;
                     }
                 }
-                if (Keyboard.GetState().IsKeyUp(blueguyShoot))
+                if (Keyboard.GetState().IsKeyUp(blueguyShoot) && Keyboard.GetState().IsKeyUp(blueguyShoot2))
                 {
                     bluefireDelay = false;
                 }
@@ -814,22 +1057,22 @@ namespace shooter2playergame
                 // Blue dodging
                 if (gameTime.TotalGameTime.TotalMilliseconds > bluetimeSinceLastDodge + blueDodgeDelay)
                 {
-                    if (Keyboard.GetState().IsKeyDown(blueguyDodge) && Keyboard.GetState().IsKeyDown(blueguyMoveDown) && blueguyPos.Y <= 345)
+                    if (Keyboard.GetState().IsKeyDown(blueguyDodge) && Keyboard.GetState().IsKeyDown(blueguyMoveDown) && blueguyPos.Y <= 345  || Keyboard.GetState().IsKeyDown(blueguyDodge2) && Keyboard.GetState().IsKeyDown(blueguyMoveDown) && blueguyPos.Y <= 345)
                     {
                         blueguyPos.Y += dodgeDistance;
                         BlueDodge(gameTime);
                     }
-                    if (Keyboard.GetState().IsKeyDown(blueguyDodge) && Keyboard.GetState().IsKeyDown(blueguyMoveUp) && blueguyPos.Y >= 250)
+                    if (Keyboard.GetState().IsKeyDown(blueguyDodge) && Keyboard.GetState().IsKeyDown(blueguyMoveUp) && blueguyPos.Y >= 250 || Keyboard.GetState().IsKeyDown(blueguyDodge2) && Keyboard.GetState().IsKeyDown(blueguyMoveUp) && blueguyPos.Y >= 250)
                     {
                         blueguyPos.Y -= dodgeDistance;
                         BlueDodge(gameTime);
                     }
-                    if (Keyboard.GetState().IsKeyDown(blueguyDodge) && Keyboard.GetState().IsKeyDown(blueguyMoveRight) && blueguyPos.X <= 245)
+                    if (Keyboard.GetState().IsKeyDown(blueguyDodge) && Keyboard.GetState().IsKeyDown(blueguyMoveRight) && blueguyPos.X <= 245  || Keyboard.GetState().IsKeyDown(blueguyDodge2) && Keyboard.GetState().IsKeyDown(blueguyMoveRight) && blueguyPos.X <= 245)
                     {
                         blueguyPos.X += dodgeDistance;
                         BlueDodge(gameTime);
                     }
-                    if (Keyboard.GetState().IsKeyDown(blueguyDodge) && Keyboard.GetState().IsKeyDown(blueguyMoveLeft) && blueguyPos.X >= 70)
+                    if (Keyboard.GetState().IsKeyDown(blueguyDodge) && Keyboard.GetState().IsKeyDown(blueguyMoveLeft) && blueguyPos.X >= 70  || Keyboard.GetState().IsKeyDown(blueguyDodge2) && Keyboard.GetState().IsKeyDown(blueguyMoveLeft) && blueguyPos.X >= 70)
                     {
                         blueguyPos.X -= dodgeDistance;
                         BlueDodge(gameTime);
@@ -862,9 +1105,11 @@ namespace shooter2playergame
             bullets.Clear();
             powerups.Clear();
             isInMainMenu = true;
+            gameIsWon = false;
             isInDesert = false;
             isInForest = false;
             isInControlsMenu = false;
+            inAltControlsMenu = false;
             isInJapan = false;
             isInDojo = false;
             gameHasStarted = false;
@@ -874,6 +1119,55 @@ namespace shooter2playergame
             redScore = 0;
             blueScore = 0;
             ResetPos(); // on pressing escape it resets everything and returns to main menu
+        }
+
+        public void EnemyAction(GameTime gameTime)
+        {
+            if (bossBattleMusicCheck == true)
+            {
+                bossBattleSongCanPlay = true;
+                bossBattleMusicCheck = false;
+            }
+            if (gameTime.TotalGameTime.TotalMilliseconds > MoveStart + MoveDelay)
+            {
+                if (randomNumberToFour == 1 && enemyPos.Y > 180)
+                {
+                    MoveEnemyUp();
+                }
+                else if (randomNumberToFour == 1 && enemyPos.Y <= 180)
+                {
+                    MoveEnemyDown();
+                    randomNumberToFour = 2;
+                }
+                if (randomNumberToFour == 2 && enemyPos.Y < 370)
+                {
+                    MoveEnemyDown();
+                }
+                else if (randomNumberToFour == 2 && enemyPos.Y >= 370)
+                {
+                    MoveEnemyUp();
+                    randomNumberToFour = 1;
+                } else
+                {
+                    EnemyFire(gameTime);
+                }
+            }
+        }
+        void MoveEnemyUp()
+        {
+            enemyPos.Y -= 3;
+        }
+        void MoveEnemyDown()
+        {
+            enemyPos.Y += 3;
+        }
+        void EnemyFire(GameTime gameTime)
+        {
+            if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastFired + fireDelay)
+            {
+                smileys.Add(new Smiley(smileySprite, enemyPos + new Vector2(-20, 50), new Vector2(-7, 0)));
+                timeSinceLastFired = gameTime.TotalGameTime.TotalMilliseconds;
+            }
         }
 
         protected override void Draw(GameTime gameTime)
@@ -960,12 +1254,11 @@ namespace shooter2playergame
                     }
                 }
 
-                //if (redScore > 14 && redScore < 18 || blueScore > 14 && blueScore < 18 || redScore + blueScore > 14 && redScore + blueScore < 18)
-                //{
-                //    _spriteBatch.DrawString(font, "You've been fighting for a while.", new Vector2(260, 440), Color.Black);
-                //    _spriteBatch.DrawString(font, "In the menu, hold down the keys that spell ANIME for your final fight.", new Vector2(150, 460), Color.Black);
-                //}
-                // Keeping this unavailable for now
+                if (redScore > 9 && redScore < 13 || blueScore > 9 && blueScore < 13 || redScore + blueScore > 9 && redScore + blueScore < 13)
+                {
+                    _spriteBatch.DrawString(font, "You've been fighting for a while.", new Vector2(260, 440), Color.Black);
+                    _spriteBatch.DrawString(font, "In the menu, hold down the keys that spell ANIME for your final fight.", new Vector2(150, 460), Color.Black);
+                }
             }
 
             // Drawing main menu
@@ -979,8 +1272,17 @@ namespace shooter2playergame
             {
                 _spriteBatch.Draw(controlsScreen, new Vector2(0, 0), Color.White);
             }
-            
+            if (inAltControlsMenu == true)
+            {
+                _spriteBatch.Draw(controlsScreenAlt, new Vector2(0, 0), Color.White);
+            }
+
             // Drawing japanese stuff
+            Rectangle finalBossRect = new Rectangle((int)540, (int)225, finalBoss.Width * scale, finalBoss.Height * scale);
+            Rectangle redGraveRect = new Rectangle((int)redguyPos.X, (int)redguyPos.Y, graveStone.Width * 2, graveStone.Height * 2);
+            Rectangle blueGraveRect = new Rectangle((int)blueguyPos.X, (int)blueguyPos.Y, graveStone.Width * 2, graveStone.Height * 2);
+            enemyRect = new Rectangle((int)enemyPos.X, (int)enemyPos.Y, (int)YellowguyARMS.Width * enemyScale, (int)YellowguyARMS.Height * enemyScale);
+
             if (isInJapan == true)
             {
                 _spriteBatch.Draw(japaneseMenu, new Vector2(0, 0), Color.White);
@@ -1002,7 +1304,7 @@ namespace shooter2playergame
                     }
                     else
                     {
-                        _spriteBatch.Draw(graveStone, new Vector2(redguyPos.X, redguyPos.Y), Color.White);
+                        _spriteBatch.Draw(graveStone, redGraveRect, Color.White);
                     }
                 }
                 if (blueIsAliveCOOP == true)
@@ -1016,7 +1318,7 @@ namespace shooter2playergame
                     }
                 } else
                 {
-                    _spriteBatch.Draw(graveStone, new Vector2(blueguyPos.X, blueguyPos.Y), Color.White);
+                    _spriteBatch.Draw(graveStone, blueGraveRect, Color.White);
                 }
                 if (redguyPos.Y > blueguyPos.Y)
                 {
@@ -1033,15 +1335,41 @@ namespace shooter2playergame
                     }
                     else
                     {
-                        _spriteBatch.Draw(graveStone, new Vector2(redguyPos.X, redguyPos.Y), Color.White);
+                        _spriteBatch.Draw(graveStone, redGraveRect, Color.White);
                     }
                 }
+                if (gameTime.TotalGameTime.TotalMilliseconds < cutscenepart1start + cutscenepart1time)
+                {
+                    _spriteBatch.Draw(finalBoss, finalBossRect, Color.White);
+                }
+                if (gameTime.TotalGameTime.TotalMilliseconds > transformationstart && gameTime.TotalGameTime.TotalMilliseconds < transformationstart + transformationtime)
+                {
+                    _spriteBatch.Draw(yellowguyBG, new Vector2(0, 0), Color.White);
+                }
+                if (gameTime.TotalGameTime.TotalMilliseconds > transformationstart + transformationtime)
+                {
+                    _spriteBatch.Draw(YellowguyARMS, enemyRect, Color.White);
+                    enemyHealthString = enemyHealth.ToString();
+                    _spriteBatch.DrawString(fontBold, "Boss Health: " + enemyHealthString, new Vector2(620, 10), Color.Black);
+                }
+            }
+            if (COOPFailure == true)
+            {
+                _spriteBatch.Draw(LoseScreen, new Vector2(0, 0), Color.White);
+            }
+            if (gameIsWon == true)
+            {
+                _spriteBatch.Draw(YoureWinner, new Vector2(0, 0), Color.White);
             }
 
             // Drawing items (bullets, powerups)
             for (int i = 0; i < powerups.Count; i++)
             {
                 powerups[i].Draw(_spriteBatch);
+            }
+            for (int i = 0; i < smileys.Count; i++)
+            {
+                smileys[i].Draw(_spriteBatch);
             }
             for (int i = 0; i < bullets.Count; i++)
             {
