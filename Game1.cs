@@ -1256,7 +1256,7 @@ namespace shooter2playergame
                     }
                 }
 
-                if (redScore > 9 && redScore < 13 || blueScore > 9 && blueScore < 13 || redScore + blueScore > 9 && redScore + blueScore < 13)
+                if (redScore + blueScore > 9 && redScore + blueScore < 13)
                 {
                     _spriteBatch.DrawString(font, "You've been fighting for a while.", new Vector2(260, 440), Color.Black);
                     _spriteBatch.DrawString(font, "In the menu, hold down the keys that spell ANIME for your final fight.", new Vector2(150, 460), Color.Black);
