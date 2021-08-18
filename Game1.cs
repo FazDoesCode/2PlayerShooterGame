@@ -363,7 +363,6 @@ namespace shooter2playergame
                 {
                     funnyModeCanClick = false;
                     isInFunnyMode = true;
-                    Debug.WriteLine("Funny Mode Activated");
                     funnyModeTextDisplay = true;
                     funnyModeTextTimer = gameTime.TotalGameTime.TotalMilliseconds;
                 }
@@ -375,11 +374,11 @@ namespace shooter2playergame
                 {
                     funnyModeCanClick = false;
                     isInFunnyMode = false;
-                    Debug.WriteLine("Funny Mode Deactivated");
                     funnyModeTextDisplay = true;
                     funnyModeTextTimer = gameTime.TotalGameTime.TotalMilliseconds;
                 }
             }
+
             if (mouseState.LeftButton == ButtonState.Released)
             {
                 funnyModeCanClick = true;
@@ -1311,17 +1310,17 @@ namespace shooter2playergame
             if (isInMainMenu == true)
             {
                 _spriteBatch.Draw(MainMenuSprite, new Vector2(0, 0), Color.White);
-                _spriteBatch.Draw(funnyModeButton, new Vector2(591, 405), Color.White);
+                _spriteBatch.Draw(funnyModeButton, new Vector2(591, 400), Color.White);
             }
 
             // Drawing Funny Mode Text
             if (funnyModeTextDisplay == true)
             {
-                if (isInFunnyMode == true && gameTime.TotalGameTime.TotalMilliseconds < funnyModeTextTimer + funnyModeTextTime)
+                if (isInFunnyMode == true && gameTime.TotalGameTime.TotalMilliseconds < funnyModeTextTimer + funnyModeTextTime && isInMainMenu == true)
                 {
                     _spriteBatch.DrawString(fontBold, "Funny Mode Activated!", new Vector2(285, 200), Color.Black);
                 }
-                if (isInFunnyMode == false && gameTime.TotalGameTime.TotalMilliseconds < funnyModeTextTimer + funnyModeTextTime)
+                if (isInFunnyMode == false && gameTime.TotalGameTime.TotalMilliseconds < funnyModeTextTimer + funnyModeTextTime && isInMainMenu == true)
                 {
                     _spriteBatch.DrawString(fontBold, "Funny Mode Deactivated!", new Vector2(275, 200), Color.Black);
                 }
