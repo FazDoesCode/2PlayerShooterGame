@@ -39,6 +39,7 @@ namespace shooter2playergame
         Texture2D LoseScreen;
         Texture2D YoureWinner;
         Texture2D controlsScreenAlt;
+        Texture2D funnyModeButton;
 
         // Declaring fonts
         SpriteFont font;
@@ -132,6 +133,14 @@ namespace shooter2playergame
         double REDpowerupTimer = 0;
         double BLUEpowerupTimer = 0;
         int powerupTime = 5000; // The powerups are active for 5 seconds
+
+        // Funny Mode Stuff
+        bool isInFunnyMode = false;
+        bool overFunnyButton = false;
+        bool funnyModeTextDisplay = false;
+        double funnyModeTextTimer = 0;
+        int funnyModeTextTime = 2000;
+        bool funnyModeCanClick = true;
 
         // Japanese mode stuff (Secret so don't tell anyone ok)
         Texture2D japaneseMenu;
@@ -241,6 +250,7 @@ namespace shooter2playergame
             bulletSprite = Content.Load<Texture2D>("Items/Bullet");
             powerupSprite = Content.Load<Texture2D>("Items/Fastshoe");
             graveStone = Content.Load<Texture2D>("Players/Gravestone");
+            funnyModeButton = Content.Load<Texture2D>("Items/FunnyModeButton");
 
             // Loading enemies
             smileySprite = Content.Load<Texture2D>("Enemies/Smiley");
@@ -326,6 +336,13 @@ namespace shooter2playergame
             {
                 overMap2Button = false;
             } // If the mouse is in the set box it's over the map2 button
+            if (mouseState.X > 591 && mouseState.Y > 405)
+            {
+                overFunnyButton = true;
+            } else
+            {
+                overFunnyButton = false;
+            }
             if (overMap1Button == true && mouseState.LeftButton == ButtonState.Pressed && isInMainMenu == true)
             {
                 isInMainMenu = false;
@@ -339,6 +356,33 @@ namespace shooter2playergame
                 isInForest = true;
                 gameHasStarted = true;
                 MediaPlayer.Stop(); // Sets the background to the forest and stops playing music
+            }
+            if (overFunnyButton == true && mouseState.LeftButton == ButtonState.Pressed && isInMainMenu == true && funnyModeCanClick == true)
+            {
+                if (isInFunnyMode == false)
+                {
+                    funnyModeCanClick = false;
+                    isInFunnyMode = true;
+                    Debug.WriteLine("Funny Mode Activated");
+                    funnyModeTextDisplay = true;
+                    funnyModeTextTimer = gameTime.TotalGameTime.TotalMilliseconds;
+                }
+            }
+            if (overFunnyButton == true && mouseState.LeftButton == ButtonState.Pressed && isInMainMenu == true && funnyModeCanClick == true)
+            {
+
+                if (isInFunnyMode == true)
+                {
+                    funnyModeCanClick = false;
+                    isInFunnyMode = false;
+                    Debug.WriteLine("Funny Mode Deactivated");
+                    funnyModeTextDisplay = true;
+                    funnyModeTextTimer = gameTime.TotalGameTime.TotalMilliseconds;
+                }
+            }
+            if (mouseState.LeftButton == ButtonState.Released)
+            {
+                funnyModeCanClick = true;
             }
             
             // Controls Menu Stuff (same as backgrounds basically)
@@ -878,7 +922,7 @@ namespace shooter2playergame
                     }
                 }
             }
-        } // THIS SAME BASE IS USED TO REDGUYJAPAN WITH A FEW DIFFERENCES, SAME GOES FOR BLUE
+        } // THIS SAME BASE IS USED FOR REDGUYJAPAN WITH A FEW DIFFERENCES, SAME GOES FOR BLUE
         void RedguyMoveJAPAN(GameTime gameTime)
         {
             if (redIsDodging == false)
@@ -1267,6 +1311,20 @@ namespace shooter2playergame
             if (isInMainMenu == true)
             {
                 _spriteBatch.Draw(MainMenuSprite, new Vector2(0, 0), Color.White);
+                _spriteBatch.Draw(funnyModeButton, new Vector2(591, 405), Color.White);
+            }
+
+            // Drawing Funny Mode Text
+            if (funnyModeTextDisplay == true)
+            {
+                if (isInFunnyMode == true && gameTime.TotalGameTime.TotalMilliseconds < funnyModeTextTimer + funnyModeTextTime)
+                {
+                    _spriteBatch.DrawString(fontBold, "Funny Mode Activated!", new Vector2(285, 200), Color.Black);
+                }
+                if (isInFunnyMode == false && gameTime.TotalGameTime.TotalMilliseconds < funnyModeTextTimer + funnyModeTextTime)
+                {
+                    _spriteBatch.DrawString(fontBold, "Funny Mode Deactivated!", new Vector2(275, 200), Color.Black);
+                }
             }
 
             // Drawing controls menu
