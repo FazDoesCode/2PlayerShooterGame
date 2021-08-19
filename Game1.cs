@@ -141,6 +141,11 @@ namespace shooter2playergame
         double funnyModeTextTimer = 0;
         int funnyModeTextTime = 2000;
         bool funnyModeCanClick = true;
+        Texture2D amogusred;
+        Texture2D trollface;
+        Texture2D spongebob;
+        SoundEffect vineboom;
+        Texture2D amogusdodge;
 
         // Japanese mode stuff (Secret so don't tell anyone ok)
         Texture2D japaneseMenu;
@@ -245,6 +250,9 @@ namespace shooter2playergame
             blueguySpriteDead = Content.Load<Texture2D>("Players/Blueguydead");
             blueguyCOOP = Content.Load<Texture2D>("Players/BlueguyCOOP");
             blueguyDodgeCOOP = Content.Load<Texture2D>("Players/BlueguydodgelargeCOOP");
+            trollface = Content.Load<Texture2D>("Funnymode/trollface");
+            amogusred = Content.Load<Texture2D>("Funnymode/amogus");
+            amogusdodge = Content.Load<Texture2D>("Funnymode/amogusdodge");
 
             // Loading miscellaneous sprites
             bulletSprite = Content.Load<Texture2D>("Items/Bullet");
@@ -270,6 +278,7 @@ namespace shooter2playergame
             backgroundSprite2 = Content.Load<Texture2D>("Backgrounds/Forestbackground");
             dojoBackground = Content.Load<Texture2D>("Backgrounds/dojo");
             yellowguyBG = Content.Load<Texture2D>("Backgrounds/YellowguyBGBars");
+            spongebob = Content.Load<Texture2D>("Funnymode/spongebob");
 
             // Loading fonts
             font = Content.Load<SpriteFont>("Fonts/Font");
@@ -298,6 +307,7 @@ namespace shooter2playergame
             UghSound = Content.Load<SoundEffect>("sound effects/Ugh");
             JustDieAlready = Content.Load<SoundEffect>("sound effects/JustDieAlready");
             FuckinStupid = Content.Load<SoundEffect>("sound effects/FuckinStupid");
+            vineboom = Content.Load<SoundEffect>("Funnymode/vineboom");
         }
 
         protected override void Update(GameTime gameTime)
@@ -535,7 +545,13 @@ namespace shooter2playergame
                 popSound.Play(0.6f, 0, 0); // Plays a popping sound effect
                 randomPositionREDX = new Random().Next(180, 320);
                 randomPositionY = new Random().Next(50, 300); // makes a new random position
-                REDspawnDelay = new Random().Next(17000, 22000); // sets the next powerup to spawn in 17 to 22 seconds
+                if (isInFunnyMode == false)
+                {
+                    REDspawnDelay = new Random().Next(17000, 22000); // sets the next powerup to spawn in 17 to 22 seconds
+                } else
+                {
+                    REDspawnDelay = new Random().Next(8000, 12000);
+                }
                 timeSinceLastSpawnRED = gameTime.TotalGameTime.TotalMilliseconds;
             }
             if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastSpawnBLUE + BLUEspawnDelay) // Same as red, except affecting blue.
@@ -544,7 +560,14 @@ namespace shooter2playergame
                 popSound.Play(0.6f, 0, 0);
                 randomPositionBLUEX = new Random().Next(430, 520);
                 randomPositionY = new Random().Next(50, 300);
-                BLUEspawnDelay = new Random().Next(17000, 22000);
+                if (isInFunnyMode == false)
+                {
+                    BLUEspawnDelay = new Random().Next(17000, 22000); // sets the next powerup to spawn in 17 to 22 seconds
+                }
+                else
+                {
+                    BLUEspawnDelay = new Random().Next(8000, 12000);
+                }
                 timeSinceLastSpawnBLUE = gameTime.TotalGameTime.TotalMilliseconds;
             }
             // Powerup spawning end
@@ -557,8 +580,15 @@ namespace shooter2playergame
                 {
                     powerups.RemoveAt(i); // Removes the picked up powerup
                     blingSound.Play(0.6f, 0, 0); // Plays a bling sound
-                    redguySpeed = redguySpeed * 1.5f; // Makes redguy faster
-                    redDodgeDelay = 850; // Makes his dodge delay less, allowing him to dodge faster
+                    if (isInFunnyMode == false)
+                    {
+                        redguySpeed = redguySpeed * 1.5f; // Makes redguy faster
+                        redDodgeDelay = 850; // Makes his dodge delay less, allowing him to dodge faster
+                    } else
+                    {
+                        redguySpeed = 8f;
+                        redDodgeDelay = 250;
+                    }
                     redWalkSoundDelay = 200; // Halves the walk sound delay, so it plays more freqently
                     REDpowerupTimer = gameTime.TotalGameTime.TotalMilliseconds; // Sets the timer to the current time
                 }
@@ -570,8 +600,15 @@ namespace shooter2playergame
                 {
                     powerups.RemoveAt(i);
                     blingSound.Play(0.6f, 0, 0);
-                    blueguySpeed = blueguySpeed * 1.5f;
-                    blueDodgeDelay = 850;
+                    if (isInFunnyMode == false)
+                    {
+                        blueguySpeed = blueguySpeed * 1.5f;
+                        blueDodgeDelay = 850;
+                    } else
+                    {
+                        blueguySpeed = 12f;
+                        blueDodgeDelay = 500;
+                    }
                     blueWalkSoundDelay = 200;
                     BLUEpowerupTimer = gameTime.TotalGameTime.TotalMilliseconds;
                 }
@@ -1241,6 +1278,7 @@ namespace shooter2playergame
             // Making redguy and blueguy rectangles
             redguyRect = new Rectangle((int)redguyPos.X, (int)redguyPos.Y, redguySprite.Width * scale, redguySprite.Height * scale);
             blueguyRect = new Rectangle((int)blueguyPos.X, (int)blueguyPos.Y, blueguySprite.Width * scale, blueguySprite.Height * scale);
+            Rectangle trollfaceRect = new Rectangle((int)blueguyPos.X - 5, (int)blueguyPos.Y - 1, (int)(trollface.Width * 0.35), (int)(trollface.Height * 0.35));
             Rectangle redguyDodgeRect = new Rectangle((int)redguyPos.X, (int)redguyPos.Y, redguySpriteDodgeLarge.Width * scale, redguySpriteDodgeLarge.Height * scale);
             Rectangle blueguyDodgeRect = new Rectangle((int)blueguyPos.X, (int)blueguyPos.Y, blueguySpriteDodgeLarge.Width * scale, blueguySpriteDodgeLarge.Height * scale);
 
@@ -1251,24 +1289,51 @@ namespace shooter2playergame
                 {
                     if (gameTime.TotalGameTime.TotalMilliseconds > redInvulnTimer + redInvulnTime)
                     {
-                        _spriteBatch.Draw(redguySprite, redguyRect, Color.White);
+                        if (isInFunnyMode == false)
+                        {
+                            _spriteBatch.Draw(redguySprite, redguyRect, Color.White);
+                        } else
+                        {
+                            _spriteBatch.Draw(amogusred, redguyRect, Color.White);
+                        }
                     }
                     else
                     {
-                        _spriteBatch.Draw(redguySpriteDodgeLarge, redguyDodgeRect, Color.White);
+                        if (isInFunnyMode == false)
+                        {
+                            _spriteBatch.Draw(redguySpriteDodgeLarge, redguyDodgeRect, Color.White);
+                        } else
+                        {
+                            _spriteBatch.Draw(amogusdodge, redguyDodgeRect, Color.White);
+                        }
                     }
                 }
 
                 // Drawing Blueguy sprites
+
                 if (redHasScored == false)
                 {
-                    if (gameTime.TotalGameTime.TotalMilliseconds > blueInvulnTimer + blueInvulnTime)
+                    if (isInFunnyMode == false)
                     {
-                        _spriteBatch.Draw(blueguySprite, blueguyRect, Color.White);
-                    }
-                    else
+                        if (gameTime.TotalGameTime.TotalMilliseconds > blueInvulnTimer + blueInvulnTime)
+                        {
+                            _spriteBatch.Draw(blueguySprite, blueguyRect, Color.White);
+                        }
+                        else
+                        {
+                            _spriteBatch.Draw(blueguySpriteDodgeLarge, blueguyDodgeRect, Color.White);
+                        }
+                    } else
                     {
-                        _spriteBatch.Draw(blueguySpriteDodgeLarge, blueguyDodgeRect, Color.White);
+                        if (gameTime.TotalGameTime.TotalMilliseconds > blueInvulnTimer + blueInvulnTime)
+                        {
+                            _spriteBatch.Draw(blueguySprite, blueguyRect, Color.White);
+                            _spriteBatch.Draw(trollface, trollfaceRect, Color.White);
+                        }
+                        else
+                        {
+                            _spriteBatch.Draw(trollface, blueguyDodgeRect, Color.White);
+                        }
                     }
                 }
 
