@@ -141,11 +141,16 @@ namespace shooter2playergame
         double funnyModeTextTimer = 0;
         int funnyModeTextTime = 2000;
         bool funnyModeCanClick = true;
+        bool funnyMusicCanPlay = true;
         Texture2D amogusred;
         Texture2D trollface;
+        Texture2D amogusdodge;
         Texture2D spongebob;
         SoundEffect vineboom;
-        Texture2D amogusdodge;
+        SoundEffect amogusSound;
+        SoundEffect bruh;
+        SoundEffect ooohfunny;
+        Song Gnagnao;
 
         // Japanese mode stuff (Secret so don't tell anyone ok)
         Texture2D japaneseMenu;
@@ -292,6 +297,7 @@ namespace shooter2playergame
             BossBattleMusic = Content.Load<Song>("music/BossBattleMusic");
             GameOverMusic = Content.Load<Song>("music/GameOverMusic");
             EndCreditsSong = Content.Load<Song>("music/EndCreditsSong");
+            Gnagnao = Content.Load<Song>("Funnymode/Gnagnao");
 
             // Loading sound effects
             pew = Content.Load<SoundEffect>("sound effects/pew");
@@ -308,11 +314,31 @@ namespace shooter2playergame
             JustDieAlready = Content.Load<SoundEffect>("sound effects/JustDieAlready");
             FuckinStupid = Content.Load<SoundEffect>("sound effects/FuckinStupid");
             vineboom = Content.Load<SoundEffect>("Funnymode/vineboom");
+            amogusSound = Content.Load<SoundEffect>("Funnymode/amogussound");
+            bruh = Content.Load<SoundEffect>("Funnymode/bruh");
+            ooohfunny = Content.Load<SoundEffect>("Funnymode/ooohfunny");
         }
 
         protected override void Update(GameTime gameTime)
         {
             MouseState mouseState = Mouse.GetState();
+
+            if (isInJapan == true)
+            {
+                isInFunnyMode = false;
+            }
+
+            if (isInFunnyMode == true)
+            {
+                if (gameTime.TotalGameTime.TotalMilliseconds > REDpowerupTimer + powerupTime)
+                {
+                    redguySpeed = 6f;
+                }
+                if (gameTime.TotalGameTime.TotalMilliseconds > BLUEpowerupTimer + powerupTime)
+                {
+                    blueguySpeed = 6f;
+                }
+            }
 
             // Moving bullets forwards / backwards
             for (int i = 0; i < bullets.Count; i++)
@@ -373,6 +399,8 @@ namespace shooter2playergame
                 {
                     funnyModeCanClick = false;
                     isInFunnyMode = true;
+                    MediaPlayer.Volume = 0.15f;
+                    ooohfunny.Play(0.5f, 0, 0);
                     funnyModeTextDisplay = true;
                     funnyModeTextTimer = gameTime.TotalGameTime.TotalMilliseconds;
                 }
@@ -392,6 +420,14 @@ namespace shooter2playergame
             if (mouseState.LeftButton == ButtonState.Released)
             {
                 funnyModeCanClick = true;
+            }
+
+            if (isInDesert == true && isInFunnyMode == true && funnyMusicCanPlay == true || isInForest == true && isInFunnyMode == true && funnyMusicCanPlay == true)
+            {
+                MediaPlayer.Play(Gnagnao);
+                MediaPlayer.Volume = 0.2f;
+                MediaPlayer.IsRepeating = true;
+                funnyMusicCanPlay = false;
             }
             
             // Controls Menu Stuff (same as backgrounds basically)
@@ -494,7 +530,13 @@ namespace shooter2playergame
                             timeSinceLastSpawnBLUE = gameTime.TotalGameTime.TotalMilliseconds; // Sets powerup time spawned to the current time to stop them from spawning
                             powerups.Clear(); // Clears all powerups on screen
                             blueScore = blueScore + 1; // adds 1 to blue's score
-                            deathSound.Play(0.5f, 0, 0); // plays a death sound
+                            if (isInFunnyMode == false)
+                            {
+                                deathSound.Play(0.5f, 0, 0); // plays a death sound
+                            } else
+                            {
+                                vineboom.Play(0.2f, 0, 0);
+                            }
                             blueHasScored = true; // sets bluehasscored to true, so that it can display the 'Blue scored!' text
                             redguySpeed = 3;
                             redDodgeDelay = 1200;
@@ -518,7 +560,13 @@ namespace shooter2playergame
                             timeSinceLastSpawnBLUE = gameTime.TotalGameTime.TotalMilliseconds;
                             powerups.Clear();
                             redScore = redScore + 1;
-                            deathSound.Play(0.5f, 0, 0);
+                            if (isInFunnyMode == false)
+                            {
+                                deathSound.Play(0.5f, 0, 0);
+                            } else
+                            {
+                                vineboom.Play(0.4f, 0, 0);
+                            }
                             redHasScored = true;
                             redguySpeed = 3;
                             redDodgeDelay = 1200;
@@ -586,8 +634,8 @@ namespace shooter2playergame
                         redDodgeDelay = 850; // Makes his dodge delay less, allowing him to dodge faster
                     } else
                     {
-                        redguySpeed = 8f;
-                        redDodgeDelay = 250;
+                        redguySpeed = redguySpeed * 2;
+                        redDodgeDelay = redDodgeDelay / 2;
                     }
                     redWalkSoundDelay = 200; // Halves the walk sound delay, so it plays more freqently
                     REDpowerupTimer = gameTime.TotalGameTime.TotalMilliseconds; // Sets the timer to the current time
@@ -606,8 +654,8 @@ namespace shooter2playergame
                         blueDodgeDelay = 850;
                     } else
                     {
-                        blueguySpeed = 12f;
-                        blueDodgeDelay = 500;
+                        blueguySpeed = blueguySpeed * 2;
+                        blueDodgeDelay = blueDodgeDelay / 2;
                     }
                     blueWalkSoundDelay = 200;
                     BLUEpowerupTimer = gameTime.TotalGameTime.TotalMilliseconds;
@@ -924,7 +972,13 @@ namespace shooter2playergame
                     if (redfireDelay == false)
                     {
                         bullets.Add(new Bullet(bulletSprite, redguyPos + new Vector2(50, 40), new Vector2(7, 0))); // Adds a new bullet at redguy's position with the horizontal speed of +7
-                        pew.Play(0.2f, 0, 0);
+                        if (isInFunnyMode == false)
+                        {
+                            pew.Play(0.2f, 0, 0);
+                        } else
+                        {
+                            amogusSound.Play(0.05f, 0, 0);
+                        }
                         redfireDelay = true; // Red cannot fire if the shoot button is held down
                     }
                 }
@@ -1066,7 +1120,13 @@ namespace shooter2playergame
                     if (bluefireDelay == false)
                     {
                         bullets.Add(new Bullet(bulletSprite, blueguyPos + new Vector2(-10, 40), new Vector2(-7, 0)));
-                        bang.Play(0.2f, 0, 0);
+                        if (isInFunnyMode == false)
+                        {
+                            bang.Play(0.2f, 0, 0);
+                        } else
+                        {
+                            bruh.Play(0.2f, 0, 0);
+                        }
                         bluefireDelay = true;
                     }
                 }
@@ -1196,6 +1256,7 @@ namespace shooter2playergame
             isInDojo = false;
             gameHasStarted = false;
             menuMusicCanPlay = true;
+            funnyMusicCanPlay = true;
             redHasScored = false;
             blueHasScored = false;
             redScore = 0;
@@ -1278,7 +1339,7 @@ namespace shooter2playergame
             // Making redguy and blueguy rectangles
             redguyRect = new Rectangle((int)redguyPos.X, (int)redguyPos.Y, redguySprite.Width * scale, redguySprite.Height * scale);
             blueguyRect = new Rectangle((int)blueguyPos.X, (int)blueguyPos.Y, blueguySprite.Width * scale, blueguySprite.Height * scale);
-            Rectangle trollfaceRect = new Rectangle((int)blueguyPos.X - 5, (int)blueguyPos.Y - 1, (int)(trollface.Width * 0.35), (int)(trollface.Height * 0.35));
+            Rectangle trollfaceRect = new Rectangle((int)blueguyPos.X - 4, (int)blueguyPos.Y - 1, (int)(trollface.Width * 0.35), (int)(trollface.Height * 0.35));
             Rectangle redguyDodgeRect = new Rectangle((int)redguyPos.X, (int)redguyPos.Y, redguySpriteDodgeLarge.Width * scale, redguySpriteDodgeLarge.Height * scale);
             Rectangle blueguyDodgeRect = new Rectangle((int)blueguyPos.X, (int)blueguyPos.Y, blueguySpriteDodgeLarge.Width * scale, blueguySpriteDodgeLarge.Height * scale);
 
@@ -1345,8 +1406,11 @@ namespace shooter2playergame
 
                 if (redHasScored == true)
                 {
-                    _spriteBatch.Draw(blueguySpriteDead, blueguyRect, Color.White);
-                    _spriteBatch.DrawString(fontBold, "Red Scored!", new Vector2(330, 215), Color.Black);
+                    if (isInFunnyMode == false)
+                    {
+                        _spriteBatch.Draw(blueguySpriteDead, blueguyRect, Color.White);
+                        _spriteBatch.DrawString(fontBold, "Red Scored!", new Vector2(330, 215), Color.Black);
+                    }
                     if (gameTime.TotalGameTime.TotalMilliseconds > redTimeSinceLastScore + scoreDelay)
                     {
                         redHasScored = false;
@@ -1355,13 +1419,21 @@ namespace shooter2playergame
                 }
                 if (blueHasScored == true)
                 {
-                    _spriteBatch.Draw(redguySpriteDead, redguyRect, Color.White);
-                    _spriteBatch.DrawString(fontBold, "Blue Scored!", new Vector2(330, 215), Color.Black);
+                    if (isInFunnyMode == false)
+                    {
+                        _spriteBatch.Draw(redguySpriteDead, redguyRect, Color.White);
+                        _spriteBatch.DrawString(fontBold, "Blue Scored!", new Vector2(330, 215), Color.Black);
+                    }
                     if (gameTime.TotalGameTime.TotalMilliseconds > blueTimeSinceLastScore + scoreDelay)
                     {
                         blueHasScored = false;
                         ResetPos();
                     }
+                }
+
+                if (isInFunnyMode == true && redHasScored == true || isInFunnyMode == true && blueHasScored == true)
+                {
+                    _spriteBatch.Draw(spongebob, new Vector2(0, 0), Color.White);
                 }
 
                 if (redScore + blueScore > 9 && redScore + blueScore < 13)
@@ -1384,6 +1456,10 @@ namespace shooter2playergame
                 if (isInFunnyMode == true && gameTime.TotalGameTime.TotalMilliseconds < funnyModeTextTimer + funnyModeTextTime && isInMainMenu == true)
                 {
                     _spriteBatch.DrawString(fontBold, "Funny Mode Activated!", new Vector2(285, 200), Color.Black);
+                }
+                if (isInFunnyMode == true && gameTime.TotalGameTime.TotalMilliseconds > funnyModeTextTimer + funnyModeTextTime && isInMainMenu == true)
+                {
+                    MediaPlayer.Volume = 0.4f;
                 }
                 if (isInFunnyMode == false && gameTime.TotalGameTime.TotalMilliseconds < funnyModeTextTimer + funnyModeTextTime && isInMainMenu == true)
                 {

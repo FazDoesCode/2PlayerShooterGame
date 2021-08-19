@@ -207,6 +207,30 @@
 /processorParam:TextureFormat=Color
 /build:Funnymode/amogusdodge.png
 
+#begin Funnymode/amogussound.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Funnymode/amogussound.mp3
+
+#begin Funnymode/bruh.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Funnymode/bruh.mp3
+
+#begin Funnymode/Gnagnao.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Funnymode/Gnagnao.mp3
+
+#begin Funnymode/ooohfunny.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Funnymode/ooohfunny.mp3
+
 #begin Funnymode/spongebob.png
 /importer:TextureImporter
 /processor:TextureProcessor
