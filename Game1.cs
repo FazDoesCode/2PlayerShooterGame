@@ -971,12 +971,13 @@ namespace shooter2playergame
                 {
                     if (redfireDelay == false)
                     {
-                        bullets.Add(new Bullet(bulletSprite, redguyPos + new Vector2(50, 40), new Vector2(7, 0))); // Adds a new bullet at redguy's position with the horizontal speed of +7
                         if (isInFunnyMode == false)
                         {
+                            bullets.Add(new Bullet(bulletSprite, redguyPos + new Vector2(50, 40), new Vector2(7, 0))); // Adds a new bullet at redguy's position with the horizontal speed of +7
                             pew.Play(0.2f, 0, 0);
                         } else
                         {
+                            bullets.Add(new Bullet(bulletSprite, redguyPos + new Vector2(50, 40), new Vector2(14, 0)));
                             amogusSound.Play(0.05f, 0, 0);
                         }
                         redfireDelay = true; // Red cannot fire if the shoot button is held down
@@ -1119,12 +1120,13 @@ namespace shooter2playergame
                 {
                     if (bluefireDelay == false)
                     {
-                        bullets.Add(new Bullet(bulletSprite, blueguyPos + new Vector2(-10, 40), new Vector2(-7, 0)));
                         if (isInFunnyMode == false)
                         {
+                            bullets.Add(new Bullet(bulletSprite, blueguyPos + new Vector2(-10, 40), new Vector2(-7, 0)));
                             bang.Play(0.2f, 0, 0);
                         } else
                         {
+                            bullets.Add(new Bullet(bulletSprite, blueguyPos + new Vector2(-10, 40), new Vector2(-14, 0)));
                             bruh.Play(0.2f, 0, 0);
                         }
                         bluefireDelay = true;
