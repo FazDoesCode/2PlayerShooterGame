@@ -1,33 +1,3 @@
-Skip to content
-Search or jump to…
-
-Pull requests
-Issues
-Marketplace
-Explore
- 
-@FazDoesCode 
-AxxAL
-/
-MyGame
-1
-00
-Code
-Issues
-Pull requests
-Actions
-Projects
-Wiki
-Security
-Insights
-MyGame/.gitignore
-
-Axel AMOGA GIWJ(DAWHIJOUWAD
-Latest commit fbd6a5a on Apr 1
- History
- 0 contributors
-63 lines (55 sloc)  642 Bytes
-  
 #OS junk files
 [Tt]humbs.db
 *.DS_Store
@@ -86,22 +56,6 @@ monodroid*.msi
 *.cachefile
 *.dll
 
-# JetBrains
-.idea/
-
 # Misc
 .env
-© 2021 GitHub, Inc.
-Terms
-Privacy
-Security
-Status
-Docs
-Contact GitHub
-Pricing
-API
-Training
-Blog
-About
-Loading complete
 .vs/
